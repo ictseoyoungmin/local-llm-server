@@ -1,0 +1,46 @@
+services:
+  llama:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    restart: unless-stopped
+    volumes:
+      - ${HOST_MODEL_DIR:-./models}:/models:ro
+    ports:
+      - "127.0.0.1:18081:8080"
+    command:
+      - -m
+      - ${LLAMA_MODEL_PATH:-/models/model.gguf}
+      - --host
+      - ${LLAMA_HOST:-0.0.0.0}
+      - --port
+      - ${LLAMA_PORT:-8080}
+      - --ctx-size
+      - ${LLAMA_CTX_SIZE:-8192}
+      - --threads
+      - ${LLAMA_THREADS:-8}
+      - --parallel
+      - ${LLAMA_PARALLEL:-1}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/v1/models"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 180s
+
+  gateway:
+    build:
+      context: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      GATEWAY_HOST: 0.0.0.0
+      GATEWAY_PORT: 8000
+      LLAMA_UPSTREAM_BASE_URL: ${LLAMA_UPSTREAM_BASE_URL:-http://llama:8080/v1}
+      PUBLIC_MODEL_NAME: ${PUBLIC_MODEL_NAME:-local-llama}
+      LOCAL_LLM_API_KEY: ${LOCAL_LLM_API_KEY:-local-not-required}
+      REQUEST_TIMEOUT_SECONDS: ${REQUEST_TIMEOUT_SECONDS:-600}
+    ports:
+      - "127.0.0.1:18080:8000"
+    depends_on:
+      llama:
+        condition: service_healthy

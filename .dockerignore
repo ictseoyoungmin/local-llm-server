@@ -1,0 +1,13 @@
+.env
+.venv/
+.venv_hug/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.git/
+.agents/
+.codex/
+data/
+logs/
+models/
