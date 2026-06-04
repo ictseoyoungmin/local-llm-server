@@ -13,3 +13,6 @@ The active planning target is a local model switching interface for Hermes-agent
 Hermes-agent should keep using a stable OpenAI-compatible endpoint while this
 project owns model profiles, llama.cpp runtime settings, and update/rollback
 workflows.
+
+Benchmark records live under `verification/benchmarks/` and should be appended
+for every meaningful runtime change.

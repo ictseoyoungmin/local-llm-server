@@ -58,6 +58,12 @@ Download a preset model:
 ./scripts/download_model.sh qwen3.5-2b-mtp-q4-xl
 ```
 
+Record a benchmark after switching:
+
+```bash
+./scripts/benchmark_chat.py --profile qwen3.5-2b-mtp-q4-xl --label qwen-mtp-short
+```
+
 ## Current Profiles
 
 ### qwen3.5-2b-mtp-q4-xl
