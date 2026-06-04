@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import time
 from typing import Any
@@ -95,34 +96,19 @@ def append_record(path: Path, record: dict[str, Any]) -> None:
 
 
 def apply_preset(args: argparse.Namespace) -> None:
-    if args.preset == "custom":
-        return
-    preset = PROMPT_PRESETS[args.preset]
-    if args.label == parser_default("label"):
-        args.label = preset["label"]
-    if args.system == parser_default("system"):
-        args.system = preset["system"]
-    if args.prompt == parser_default("prompt"):
-        args.prompt = preset["prompt"]
-    if args.max_tokens == parser_default("max_tokens"):
-        args.max_tokens = int(preset["max_tokens"])
+    preset = PROMPT_PRESETS.get(args.preset, {}) if args.preset != "custom" else {}
+
+    args.label = args.label or preset.get("label") or "custom"
+    args.system = args.system or preset.get("system") or "You are concise."
+    args.prompt = args.prompt or preset.get("prompt") or "Reply with: ready"
+    args.max_tokens = args.max_tokens or int(preset.get("max_tokens") or 8)
 
 
-def parser_default(name: str) -> Any:
-    defaults = {
-        "label": "short-ready",
-        "system": "You are concise.",
-        "prompt": "Reply with: ready",
-        "max_tokens": 8,
-    }
-    return defaults[name]
-
-
-def main() -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run and record an OpenAI-compatible chat benchmark.")
-    parser.add_argument("--base-url", default="http://127.0.0.1:18080/v1")
-    parser.add_argument("--api-key", default="local-not-required")
-    parser.add_argument("--model", default="qwen3.5-2b-mtp-ud-q4-k-xl")
+    parser.add_argument("--base-url", default=os.getenv("OPENAI_BASE_URL", "http://127.0.0.1:18080/v1"))
+    parser.add_argument("--api-key", default=os.getenv("OPENAI_API_KEY", "local-not-required"))
+    parser.add_argument("--model", default=os.getenv("OPENAI_MODEL", "local-llama"))
     parser.add_argument("--profile", default="")
     parser.add_argument(
         "--preset",
@@ -130,16 +116,25 @@ def main() -> int:
         default="short-ready",
         help="Benchmark prompt preset. Use custom with --system/--prompt.",
     )
-    parser.add_argument("--label", default="short-ready")
-    parser.add_argument("--system", default="You are concise.")
-    parser.add_argument("--prompt", default="Reply with: ready")
-    parser.add_argument("--max-tokens", type=int, default=8)
+    parser.add_argument("--label", default=None)
+    parser.add_argument("--system", default=None)
+    parser.add_argument("--prompt", default=None)
+    parser.add_argument("--max-tokens", type=int, default=None)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--timeout", type=float, default=240.0)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    args = parser.parse_args()
-    apply_preset(args)
+    return parser
 
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    apply_preset(args)
+    return args
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
     started_at = utc_now()
     record: dict[str, Any] = {
         "started_at": started_at,
