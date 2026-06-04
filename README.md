@@ -394,6 +394,25 @@ If you previously started CPU mode, recreate the container after switching:
 docker compose -f docker-compose.yml -f docker-compose.gpu.example.yml up -d --force-recreate
 ```
 
+## llama.cpp Image Updates
+
+The current known-good llama.cpp CUDA image digest is recorded in:
+
+```text
+llama-image.lock
+```
+
+Check, update, or roll back the image with:
+
+```bash
+./scripts/llama_image.sh status
+./scripts/llama_image.sh update
+./scripts/llama_image.sh rollback
+```
+
+See [docs/specs/llama-image-update-rollback.md](docs/specs/llama-image-update-rollback.md)
+for the full update and verification flow.
+
 ## Consumer Setup
 
 ### gemma4-tutor

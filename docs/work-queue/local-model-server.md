@@ -32,6 +32,6 @@
 - [x] Add llama.cpp image/version update support.
 - [x] Record the current known-good llama.cpp image digest before updating.
 - [x] Add rollback support to return to the previous llama.cpp image/tag/digest.
-- [ ] Document the update/rollback command flow and failure recovery steps.
-- [ ] Evaluate building llama.cpp from source only if the container image lacks
+- [x] Document the update/rollback command flow and failure recovery steps.
+- [x] Evaluate building llama.cpp from source only if the container image lacks
   required MTP flags.
