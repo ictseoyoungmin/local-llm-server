@@ -12,7 +12,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 
-DEFAULT_OUTPUT = Path("docs/verification/benchmarks/chat-benchmarks.jsonl")
+DEFAULT_OUTPUT = Path("docs/verification/benchmarks/results/chat-benchmarks.jsonl")
 
 PROMPT_PRESETS: dict[str, dict[str, Any]] = {
     "short-ready": {

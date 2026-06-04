@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_INPUT = Path("docs/verification/benchmarks/chat-benchmarks.jsonl")
+DEFAULT_INPUT = Path("docs/verification/benchmarks/results/chat-benchmarks.jsonl")
 
 
 def load_records(path: Path) -> list[dict[str, Any]]:

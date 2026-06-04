@@ -34,10 +34,16 @@ Summarize recent records:
 ./scripts/summarize_benchmarks.py
 ```
 
-Current record file:
+Local record file:
 
 ```text
-docs/verification/benchmarks/chat-benchmarks.jsonl
+docs/verification/benchmarks/results/chat-benchmarks.jsonl
+```
+
+Committed sample file:
+
+```text
+docs/verification/benchmarks/examples/qwen3.5-2b-mtp-q4-xl.sample.jsonl
 ```
 
 Each record should include:
@@ -51,3 +57,7 @@ Each record should include:
 
 Do not delete failed benchmark rows. Failures are useful for distinguishing
 model/runtime regressions from sandbox, Docker, or gateway availability issues.
+
+Local result JSONL files under `results/` are ignored by git. Commit only
+curated sample files under `examples/` when a benchmark should become a stable
+reference point.
