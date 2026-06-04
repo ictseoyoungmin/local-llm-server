@@ -24,7 +24,8 @@
   be generated from selected model profiles. Decision: profiles are the source
   of truth for switching; `.env` remains a manual fallback and can be generated
   explicitly with `scripts/export_model_profile_env.sh`.
-- [ ] Add Qwen Q8 profile if Q4 XL quality is insufficient.
+- [x] Add Qwen Q8 profile if Q4 XL quality is insufficient. Profile added as a
+  quality fallback; default remains non-MTP Q4 XL based on current benchmarks.
 
 ## Later
 

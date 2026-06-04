@@ -116,6 +116,17 @@ KV cache: llama.cpp default
 MTP compose override: disabled
 ```
 
+### qwen3.5-2b-q8
+
+```text
+model: Qwen3.5-2B-Q8_0.gguf
+repo: unsloth/Qwen3.5-2B-MTP-GGUF
+ctx: 130000
+gpu layers: -1
+MTP compose override: disabled
+purpose: quality fallback if Q4 XL output is insufficient
+```
+
 ### qwen3.5-2b-mtp-q4-xl-kv-q8
 
 ```text
