@@ -14,8 +14,8 @@
 
 ## Next
 
-- [ ] Add profile listing to `scripts/run_model_profile.sh`.
-- [ ] Add a small status command that prints current model, ctx, health, and
+- [x] Add profile listing to `scripts/run_model_profile.sh`.
+- [x] Add a small status command that prints current model, ctx, health, and
   VRAM.
 - [ ] Decide whether `.env` should remain the default manual configuration or
   be generated from selected model profiles.

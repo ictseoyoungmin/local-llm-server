@@ -34,6 +34,18 @@ Start a profile:
 ./scripts/run_model_profile.sh qwen3.5-2b-mtp-q4-xl
 ```
 
+List profiles:
+
+```bash
+./scripts/run_model_profile.sh list
+```
+
+Check the active server:
+
+```bash
+./scripts/run_model_profile.sh status
+```
+
 Override context for one run:
 
 ```bash
