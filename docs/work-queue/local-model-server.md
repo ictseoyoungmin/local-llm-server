@@ -20,8 +20,10 @@
 - [x] Add profile listing to `scripts/run_model_profile.sh`.
 - [x] Add a small status command that prints current model, ctx, health, and
   VRAM.
-- [ ] Decide whether `.env` should remain the default manual configuration or
-  be generated from selected model profiles.
+- [x] Decide whether `.env` should remain the default manual configuration or
+  be generated from selected model profiles. Decision: profiles are the source
+  of truth for switching; `.env` remains a manual fallback and can be generated
+  explicitly with `scripts/export_model_profile_env.sh`.
 - [ ] Add Qwen Q8 profile if Q4 XL quality is insufficient.
 
 ## Later

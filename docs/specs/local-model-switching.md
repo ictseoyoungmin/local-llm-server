@@ -28,6 +28,26 @@ model-profiles/*.env
 Each profile defines the model path, public model name, context size, GPU
 offload settings, and optional runtime features.
 
+Policy:
+
+- `model-profiles/*.env` are the source of truth for switching local models.
+- `.env` remains a manual fallback and compatibility file for direct Docker
+  Compose use.
+- Generate `.env` only with an explicit command when a profile should become
+  the manual default.
+
+Export a profile to stdout:
+
+```bash
+./scripts/export_model_profile_env.sh qwen3.5-2b-q4-xl
+```
+
+Write a profile into `.env` explicitly:
+
+```bash
+./scripts/export_model_profile_env.sh qwen3.5-2b-q4-xl --output .env
+```
+
 Start a profile:
 
 ```bash
