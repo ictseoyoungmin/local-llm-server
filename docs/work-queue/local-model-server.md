@@ -11,7 +11,7 @@
 - [x] Test `LLAMA_CACHE_TYPE_K=q8_0` and `LLAMA_CACHE_TYPE_V=q8_0` for VRAM and
   speed tradeoffs. q8_0 lowered VRAM but was slower than f16 in recorded
   Hermes-routing benchmarks.
-- [ ] Add a Hermes-agent smoke test that calls
+- [x] Add a Hermes-agent smoke test that calls
   `http://host.docker.internal:18080/v1`.
 
 ## Next

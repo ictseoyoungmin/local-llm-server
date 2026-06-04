@@ -154,3 +154,24 @@ hermes-routing warm: prompt 233.04 tok/s, generation 29.32 tok/s, draft 35/288
 
 Recommendation: keep f16 KV as the default profile for speed. Keep q8_0 KV as a
 VRAM fallback profile.
+
+## Hermes-agent Provider Smoke
+
+Script:
+
+```bash
+OPENAI_BASE_URL=http://127.0.0.1:18080/v1 \
+OPENAI_MODEL=qwen3.5-2b-mtp-ud-q4-k-xl-kv-q8 \
+./scripts/smoke_hermes_agent.sh
+```
+
+Result:
+
+```text
+response: hermes local provider ready
+status: OK
+```
+
+The script defaults to `http://host.docker.internal:18080/v1` for Dockerized
+Hermes-agent use. Use the host URL override above when running the smoke test
+directly from the host.

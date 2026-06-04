@@ -46,6 +46,14 @@ Check the active server:
 ./scripts/run_model_profile.sh status
 ```
 
+Run a Hermes-agent style provider smoke test:
+
+```bash
+OPENAI_BASE_URL=http://host.docker.internal:18080/v1 \
+OPENAI_MODEL=<current PUBLIC_MODEL_NAME> \
+./scripts/smoke_hermes_agent.sh
+```
+
 Override context for one run:
 
 ```bash
@@ -110,6 +118,15 @@ OPENAI_MODEL=<current PUBLIC_MODEL_NAME>
 
 The model profile owns `PUBLIC_MODEL_NAME`. If Hermes-agent validates model IDs,
 update `OPENAI_MODEL` after switching profiles.
+
+Before wiring a selected profile into Hermes-agent workflows, run:
+
+```bash
+./scripts/smoke_hermes_agent.sh
+```
+
+Use the default `host.docker.internal` URL from inside Docker, or override
+`OPENAI_BASE_URL=http://127.0.0.1:18080/v1` for host-only development.
 
 ## MTP Constraints
 
