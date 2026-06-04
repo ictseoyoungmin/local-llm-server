@@ -1,0 +1,2 @@
+LLAMA_GPU_IMAGE_TAG=ghcr.io/ggml-org/llama.cpp:server-cuda
+LLAMA_GPU_IMAGE_DIGEST=ghcr.io/ggml-org/llama.cpp@sha256:e8d36f4dc2a72a1df323748f6219c9dd11f662f7cb3b06a6b2916c9bf3866d89
