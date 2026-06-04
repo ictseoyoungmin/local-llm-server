@@ -45,7 +45,7 @@ def main() -> int:
 
     rows = records[-args.limit :]
     print(
-        f"{'STARTED':25} {'LABEL':18} {'PROFILE':24} {'OK':3} "
+        f"{'STARTED':25} {'PRESET':16} {'LABEL':18} {'PROFILE':24} {'OK':3} "
         f"{'CTX':8} {'ELAPSED_MS':10} {'P_TOK/S':8} {'G_TOK/S':8} {'DRAFT':9}"
     )
     for record in rows:
@@ -58,6 +58,7 @@ def main() -> int:
             draft = f"{timings.get('draft_n_accepted', 0)}/{timings.get('draft_n', 0)}"
         print(
             f"{record.get('started_at', '-')[:25]:25} "
+            f"{record.get('preset', '-')[:16]:16} "
             f"{record.get('label', '-')[:18]:18} "
             f"{record.get('profile', '-')[:24]:24} "
             f"{str(record.get('success', False)):3} "
