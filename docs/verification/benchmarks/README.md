@@ -26,6 +26,8 @@ Available presets:
 - `short-ready`: smoke test, not useful as a throughput benchmark.
 - `hermes-routing`: Korean task planning prompt for agent routing behavior.
 - `hermes-summary`: English verification summary prompt.
+- `local-agent-multiturn`: six-message, three-user-turn planning conversation
+  for Hermes-agent local model comparison.
 - `custom`: use explicit `--system`, `--prompt`, and `--max-tokens`.
 
 Summarize recent records:

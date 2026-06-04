@@ -50,6 +50,54 @@ PROMPT_PRESETS: dict[str, dict[str, Any]] = {
         ),
         "max_tokens": 220,
     },
+    "local-agent-multiturn": {
+        "label": "local-agent-multiturn",
+        "max_tokens": 420,
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "You are a local planning model used by Hermes-agent. "
+                    "Answer in Korean, stay concrete, and prefer operational steps."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    "로컬 LLM 서버에서 Gemma와 Qwen 프로파일을 쉽게 바꾸기 위한 "
+                    "운영 원칙을 요약해줘."
+                ),
+            },
+            {
+                "role": "assistant",
+                "content": (
+                    "모델별 env 프로파일을 분리하고, 게이트웨이 URL은 고정하며, "
+                    "전환 후 health check와 짧은 chat smoke를 항상 실행해야 한다."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    "좋아. Hermes-agent에 연결하기 전에 검증 절차를 조금 더 길게 "
+                    "단계별로 제안해줘."
+                ),
+            },
+            {
+                "role": "assistant",
+                "content": (
+                    "다운로드 파일 검증, 컨텍스트 크기 확인, cold/warm benchmark 기록, "
+                    "Hermes provider smoke, 실패 시 이전 프로파일 복구 순서로 진행한다."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    "마지막으로 이 결과를 작업 큐에 남길 때 반드시 기록해야 할 지표와 "
+                    "다음 의사결정 기준을 정리해줘."
+                ),
+            },
+        ],
+    },
 }
 
 
@@ -97,11 +145,22 @@ def append_record(path: Path, record: dict[str, Any]) -> None:
 
 def apply_preset(args: argparse.Namespace) -> None:
     preset = PROMPT_PRESETS.get(args.preset, {}) if args.preset != "custom" else {}
+    custom_messages = args.system is not None or args.prompt is not None
 
     args.label = args.label or preset.get("label") or "custom"
     args.system = args.system or preset.get("system") or "You are concise."
     args.prompt = args.prompt or preset.get("prompt") or "Reply with: ready"
     args.max_tokens = args.max_tokens or int(preset.get("max_tokens") or 8)
+    args.messages = None if custom_messages or args.preset == "custom" else preset.get("messages")
+
+
+def build_messages(args: argparse.Namespace) -> list[dict[str, str]]:
+    if args.messages:
+        return args.messages
+    return [
+        {"role": "system", "content": args.system},
+        {"role": "user", "content": args.prompt},
+    ]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -147,6 +206,9 @@ def main(argv: list[str] | None = None) -> int:
         "temperature": args.temperature,
         "success": False,
     }
+    messages = build_messages(args)
+    record["message_count"] = len(messages)
+    record["turn_count"] = sum(1 for message in messages if message.get("role") == "user")
 
     try:
         health = get_json(f"{args.base_url.rstrip('/')}/health", timeout=10)
@@ -160,10 +222,7 @@ def main(argv: list[str] | None = None) -> int:
 
     payload = {
         "model": args.model,
-        "messages": [
-            {"role": "system", "content": args.system},
-            {"role": "user", "content": args.prompt},
-        ],
+        "messages": messages,
         "thinking": False,
         "chat_template_kwargs": {"enable_thinking": False},
         "temperature": args.temperature,

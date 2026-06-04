@@ -33,3 +33,30 @@ def test_custom_preset_uses_fallbacks():
     assert args.system == "You are concise."
     assert args.prompt == "Reply with: ready"
     assert args.max_tokens == 8
+
+
+def test_multiturn_preset_builds_prior_context():
+    args = benchmark_chat.parse_args(["--preset", "local-agent-multiturn"])
+
+    messages = benchmark_chat.build_messages(args)
+
+    assert args.label == "local-agent-multiturn"
+    assert args.max_tokens == 420
+    assert len(messages) == 6
+    assert [message["role"] for message in messages].count("user") == 3
+
+
+def test_multiturn_preset_allows_custom_prompt_override():
+    args = benchmark_chat.parse_args(
+        [
+            "--preset",
+            "local-agent-multiturn",
+            "--prompt",
+            "Reply with one sentence.",
+        ]
+    )
+
+    messages = benchmark_chat.build_messages(args)
+
+    assert len(messages) == 2
+    assert messages[-1]["content"] == "Reply with one sentence."
