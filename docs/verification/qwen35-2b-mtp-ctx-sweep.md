@@ -175,3 +175,31 @@ status: OK
 The script defaults to `http://host.docker.internal:18080/v1` for Dockerized
 Hermes-agent use. Use the host URL override above when running the smoke test
 directly from the host.
+
+## MTP On/Off Long Benchmark
+
+Profiles:
+
+```text
+MTP off: qwen3.5-2b-q4-xl
+MTP on:  qwen3.5-2b-mtp-q4-xl
+```
+
+Benchmark preset:
+
+```text
+hermes-summary
+```
+
+Results:
+
+| Profile | State | Prompt tok/s | Generation tok/s | Elapsed ms | Draft |
+| --- | --- | ---: | ---: | ---: | ---: |
+| qwen3.5-2b-q4-xl | cold | 1.36 | 47.38 | 97969.384 | - |
+| qwen3.5-2b-q4-xl | warm | 21.44 | 59.04 | 4020.707 | - |
+| qwen3.5-2b-mtp-q4-xl | cold | 1.27 | 10.69 | 120941.171 | 116/608 |
+| qwen3.5-2b-mtp-q4-xl | warm | 18.21 | 33.26 | 6960.388 | 114/620 |
+
+Recommendation: use the non-MTP Qwen Q4 XL profile for Hermes-agent by default
+on this GTX 1660 6GB machine. Keep the MTP profile available for regression
+testing after llama.cpp image updates.

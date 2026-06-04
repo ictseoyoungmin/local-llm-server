@@ -5,8 +5,9 @@
 - [x] Verify `docker-compose.gpu-mtp.example.yml` with
   `qwen3.5-2b-mtp-q4-xl` and confirm llama.cpp no longer logs
   `no implementations specified for speculative decoding`.
-- [ ] Run a longer MTP on/off benchmark at `LLAMA_CTX_SIZE=130000`; the short
-  2-token check confirmed activation but was not a useful speed test.
+- [x] Run a longer MTP on/off benchmark at `LLAMA_CTX_SIZE=130000`; MTP was
+  slower than the non-MTP Qwen Q4 XL profile for the recorded Hermes-summary
+  workload.
 - [x] Add persistent benchmark records for every benchmark attempt.
 - [x] Test `LLAMA_CACHE_TYPE_K=q8_0` and `LLAMA_CACHE_TYPE_V=q8_0` for VRAM and
   speed tradeoffs. q8_0 lowered VRAM but was slower than f16 in recorded
