@@ -345,6 +345,27 @@ This switches the llama.cpp image to:
 LLAMA_GPU_IMAGE=ghcr.io/ggml-org/llama.cpp:server-cuda
 ```
 
+NVIDIA GPU + MTP speculative decoding mode:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.gpu-mtp.example.yml up --build
+```
+
+Use the MTP override only with models that support MTP/speculative draft
+decoding. The override enables flash attention, configurable KV cache types,
+and:
+
+```env
+LLAMA_SPEC_TYPE=draft-mtp
+LLAMA_SPEC_DRAFT_N_MAX=6
+```
+
+MTP currently assumes one parallel slot and no multimodal projector:
+
+```env
+LLAMA_PARALLEL=1
+```
+
 NVIDIA GPU + multimodal mode:
 
 ```bash
