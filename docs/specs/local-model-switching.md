@@ -73,6 +73,18 @@ model: Qwen3.5-2B-UD-Q4_K_XL.gguf
 repo: unsloth/Qwen3.5-2B-MTP-GGUF
 ctx: 130000
 gpu layers: -1
+KV cache: f16/f16
+MTP compose override: enabled
+```
+
+### qwen3.5-2b-mtp-q4-xl-kv-q8
+
+```text
+model: Qwen3.5-2B-UD-Q4_K_XL.gguf
+repo: unsloth/Qwen3.5-2B-MTP-GGUF
+ctx: 130000
+gpu layers: -1
+KV cache: q8_0/q8_0
 MTP compose override: enabled
 ```
 

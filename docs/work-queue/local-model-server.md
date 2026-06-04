@@ -8,8 +8,9 @@
 - [ ] Run a longer MTP on/off benchmark at `LLAMA_CTX_SIZE=130000`; the short
   2-token check confirmed activation but was not a useful speed test.
 - [x] Add persistent benchmark records for every benchmark attempt.
-- [ ] Test `LLAMA_CACHE_TYPE_K=q8_0` and `LLAMA_CACHE_TYPE_V=q8_0` for VRAM and
-  speed tradeoffs.
+- [x] Test `LLAMA_CACHE_TYPE_K=q8_0` and `LLAMA_CACHE_TYPE_V=q8_0` for VRAM and
+  speed tradeoffs. q8_0 lowered VRAM but was slower than f16 in recorded
+  Hermes-routing benchmarks.
 - [ ] Add a Hermes-agent smoke test that calls
   `http://host.docker.internal:18080/v1`.
 

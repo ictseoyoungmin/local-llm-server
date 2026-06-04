@@ -110,3 +110,47 @@ draft_n_accepted: 4
 
 This confirms MTP is active, but not that it is faster for Hermes-agent. The
 2-token test is too short and showed high overhead.
+
+## q8_0 KV Cache Pass
+
+Profile:
+
+```text
+qwen3.5-2b-mtp-q4-xl-kv-q8
+```
+
+Command:
+
+```bash
+./scripts/run_model_profile.sh qwen3.5-2b-mtp-q4-xl-kv-q8 130000
+```
+
+Health:
+
+```text
+model_name: qwen3.5-2b-mtp-ud-q4-k-xl-kv-q8
+n_ctx: 130048
+status: ok
+```
+
+Observed VRAM:
+
+```text
+~4.43 GiB / 6 GiB
+```
+
+Benchmark records:
+
+```text
+hermes-routing cold: prompt 0.84 tok/s, generation 2.82 tok/s, draft 34/276
+hermes-routing warm: prompt 14.61 tok/s, generation 20.38 tok/s, draft 34/276
+```
+
+Compared with the f16 MTP warm record:
+
+```text
+hermes-routing warm: prompt 233.04 tok/s, generation 29.32 tok/s, draft 35/288
+```
+
+Recommendation: keep f16 KV as the default profile for speed. Keep q8_0 KV as a
+VRAM fallback profile.
