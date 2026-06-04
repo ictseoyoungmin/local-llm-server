@@ -3,10 +3,18 @@ set -euo pipefail
 
 load_env() {
   if [[ -f ".env" ]]; then
-    set -a
-    # shellcheck disable=SC1091
-    source ".env"
-    set +a
+    while IFS='=' read -r key value; do
+      [[ -z "${key}" || "${key}" =~ ^[[:space:]]*# ]] && continue
+      key="${key%%[[:space:]]*}"
+      [[ "${key}" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+      if [[ -z "${!key+x}" ]]; then
+        value="${value%%#*}"
+        value="${value%"${value##*[![:space:]]}"}"
+        value="${value#\"}"
+        value="${value%\"}"
+        export "${key}=${value}"
+      fi
+    done < ".env"
   fi
 }
 

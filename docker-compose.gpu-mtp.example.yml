@@ -1,0 +1,29 @@
+services:
+  llama:
+    image: ${LLAMA_GPU_IMAGE:-ghcr.io/ggml-org/llama.cpp:server-cuda}
+    gpus: all
+    command:
+      - -m
+      - ${LLAMA_MODEL_PATH:-/models/model.gguf}
+      - --host
+      - ${LLAMA_HOST:-0.0.0.0}
+      - --port
+      - ${LLAMA_PORT:-8080}
+      - --ctx-size
+      - ${LLAMA_CTX_SIZE:-8192}
+      - --threads
+      - ${LLAMA_THREADS:-8}
+      - --parallel
+      - ${LLAMA_PARALLEL:-1}
+      - --n-gpu-layers
+      - ${LLAMA_N_GPU_LAYERS:--1}
+      - -fa
+      - ${LLAMA_FLASH_ATTN:-on}
+      - --cache-type-k
+      - ${LLAMA_CACHE_TYPE_K:-f16}
+      - --cache-type-v
+      - ${LLAMA_CACHE_TYPE_V:-f16}
+      - --spec-type
+      - ${LLAMA_SPEC_TYPE:-draft-mtp}
+      - --spec-draft-n-max
+      - ${LLAMA_SPEC_DRAFT_N_MAX:-6}
