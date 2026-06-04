@@ -34,18 +34,24 @@ apply_preset() {
       export HF_MODEL_REPO="unsloth/Qwen3.5-2B-MTP-GGUF"
       export HF_MODEL_FILE="Qwen3.5-2B-UD-Q4_K_XL.gguf"
       export LLAMA_MODEL_PATH="/models/qwen35/Qwen3.5-2B-UD-Q4_K_XL.gguf"
+      export LLAMA_MMPROJ_PATH=
+      export HF_MMPROJ_FILE=
       export PUBLIC_MODEL_NAME="qwen3.5-2b-mtp-ud-q4-k-xl"
       ;;
     qwen3.5-2b-mtp-q8)
       export HF_MODEL_REPO="unsloth/Qwen3.5-2B-MTP-GGUF"
       export HF_MODEL_FILE="Qwen3.5-2B-Q8_0.gguf"
       export LLAMA_MODEL_PATH="/models/qwen35/Qwen3.5-2B-Q8_0.gguf"
+      export LLAMA_MMPROJ_PATH=
+      export HF_MMPROJ_FILE=
       export PUBLIC_MODEL_NAME="qwen3.5-2b-mtp-q8-0"
       ;;
     qwen3.5-2b-mtp-q8-xl)
       export HF_MODEL_REPO="unsloth/Qwen3.5-2B-MTP-GGUF"
       export HF_MODEL_FILE="Qwen3.5-2B-UD-Q8_K_XL.gguf"
       export LLAMA_MODEL_PATH="/models/qwen35/Qwen3.5-2B-UD-Q8_K_XL.gguf"
+      export LLAMA_MMPROJ_PATH=
+      export HF_MMPROJ_FILE=
       export PUBLIC_MODEL_NAME="qwen3.5-2b-mtp-ud-q8-k-xl"
       ;;
     *)
@@ -115,7 +121,6 @@ hf_download() {
       --local-dir-use-symlinks False
   else
     "${HF_PYTHON}" -c '
-import os
 import sys
 from huggingface_hub import hf_hub_download
 
