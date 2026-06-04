@@ -22,8 +22,20 @@ host_model_dir() {
   printf '%s\n' "${HOST_MODEL_DIR:-./models}"
 }
 
+container_model_relpath() {
+  local path="${LLAMA_MODEL_PATH:-/models/model.gguf}"
+  path="${path#/models/}"
+  printf '%s\n' "${path}"
+}
+
 container_model_basename() {
   basename "${LLAMA_MODEL_PATH:-/models/model.gguf}"
+}
+
+container_mmproj_relpath() {
+  local path="${LLAMA_MMPROJ_PATH:-/models/mmproj.gguf}"
+  path="${path#/models/}"
+  printf '%s\n' "${path}"
 }
 
 container_mmproj_basename() {

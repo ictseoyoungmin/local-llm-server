@@ -7,8 +7,8 @@ source scripts/env.sh
 load_env
 
 MODEL_DIR="$(host_model_dir)"
-MODEL_FILE="${MODEL_DIR}/$(container_model_basename)"
-MMPROJ_FILE="${MODEL_DIR}/$(container_mmproj_basename)"
+MODEL_FILE="${MODEL_DIR}/$(container_model_relpath)"
+MMPROJ_FILE="${MODEL_DIR}/$(container_mmproj_relpath)"
 
 if [[ ! -f "${MODEL_FILE}" ]]; then
   cat >&2 <<EOF

@@ -302,8 +302,8 @@ For a Gemma 4 GGUF layout like `gemma4-tutor`, set:
 
 ```env
 HOST_MODEL_DIR=/absolute/path/to/models
-LLAMA_MODEL_PATH=/models/gemma-4-E2B-it-Q4_K_M.gguf
-LLAMA_MMPROJ_PATH=/models/mmproj-F16.gguf
+LLAMA_MODEL_PATH=/models/gemma4/gemma-4-E2B-it-Q4_K_M.gguf
+LLAMA_MMPROJ_PATH=/models/gemma4/mmproj-F16.gguf
 PUBLIC_MODEL_NAME=gemma-4-local
 ```
 
@@ -322,7 +322,7 @@ docker compose -f docker-compose.yml -f docker-compose.gpu-multimodal.example.ym
 Set the projector path in `.env`:
 
 ```text
-LLAMA_MMPROJ_PATH=/models/mmproj-F16.gguf
+LLAMA_MMPROJ_PATH=/models/gemma4/mmproj-F16.gguf
 ```
 
 ## CPU/GPU Selection

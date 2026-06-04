@@ -18,7 +18,7 @@ HF_CLI=/tmp/local-llm-hf-venv/bin/hf ./scripts/download_model.sh qwen3.5-2b-mtp-
 Run examples:
 
 ```bash
-env LLAMA_MODEL_PATH=/models/Qwen3.5-2B-UD-Q4_K_XL.gguf \
+env LLAMA_MODEL_PATH=/models/qwen35/Qwen3.5-2B-UD-Q4_K_XL.gguf \
   PUBLIC_MODEL_NAME=qwen3.5-2b-mtp-ud-q4-k-xl \
   LLAMA_CTX_SIZE=130000 \
   LLAMA_N_GPU_LAYERS=-1 \
