@@ -137,6 +137,14 @@ tail -200 .hermes/logs/gateway.log
 tail -200 .hermes/logs/errors.log
 ```
 
+On this WSL/Docker host, `127.0.0.1:8642` from the host has been observed to be
+intermittent after startup even while the API server is reachable from inside
+the `hermes` container. Use the runtime smoke script for the end-to-end check:
+
+```bash
+./scripts/smoke_hermes_runtime.sh
+```
+
 ## Next Verification Slice
 
 The next end-to-end slice should:
@@ -145,6 +153,7 @@ The next end-to-end slice should:
 - apply only the local model provider snippet above;
 - start or recreate the Hermes gateway container;
 - check `http://127.0.0.1:8642/v1/health`;
-- send one Hermes API server request that routes through this project;
+- send one Hermes API server request that routes through this project using
+  `./scripts/smoke_hermes_runtime.sh`;
 - record the result in `docs/verification/hermes-agent-compatibility.md`;
 - restore the previous Hermes config if the local provider blocks normal use.

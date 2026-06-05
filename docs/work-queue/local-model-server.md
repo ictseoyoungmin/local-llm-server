@@ -32,9 +32,11 @@
   quality fallback; default remains non-MTP Q4 XL based on current benchmarks.
 - [ ] Run an end-to-end Hermes tool workflow and record whether llama.cpp
   honors tool schemas for the selected profile/runtime.
-- [ ] Apply the local model config to the full
+- [x] Apply the local model config to the full
   `/mnt/f/NowWorking/hermes-agent` gateway runtime, excluding secrets, and
   record gateway `/v1/health` plus API request behavior.
+- [ ] Diagnose why host access to Hermes `127.0.0.1:8642` is intermittent
+  while container-internal API access works.
 
 ## Later
 
