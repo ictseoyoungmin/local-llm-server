@@ -16,6 +16,7 @@ hermes-agent-smoke/*
 .hermes-runtime-example/
 .hermes/
 .hermes-local-llm-hostuid/
+.hermes-local-llm-hostuid.backup.*/
 .env.hermes-bind-test
 .env.hermes-bind-host-uid
 .hermes-runtime-bind-test/

@@ -106,3 +106,23 @@ hermes gateway local llm ready
 - Startup logs confirmed both seed files were kept, and smoke returned
   `hermes gateway local llm ready` with `prompt_tokens=14402`,
   `completion_tokens=39`, `total_tokens=14441`.
+
+2026-06-05 20:03-20:08 KST:
+
+- Stopped the running `local-llm-hermes-local-hostuid` compose runtime.
+- Moved the existing `.hermes-local-llm-hostuid/` aside to
+  `.hermes-local-llm-hostuid.backup.20260605_200350/` instead of deleting it.
+- Re-ran the hostuid flow from a fresh data directory:
+  - `init-hostuid` kept the existing env and seed config;
+  - `up-hostuid` created a new `.hermes-local-llm-hostuid/`;
+  - startup logs showed `Seeded /opt/data/config.yaml` and
+    `Seeded /opt/data/SOUL.md`;
+  - `smoke-hostuid` returned `hermes gateway local llm ready`.
+- Smoke usage was `prompt_tokens=14402`, `completion_tokens=50`,
+  `total_tokens=14452`.
+- Container-internal checks returned 200 for both
+  `http://127.0.0.1:8642/v1/health` and `http://127.0.0.1:9119/chat`.
+- WSL-side curl to Docker-published `127.0.0.1:48642/49119` failed with
+  `curl: (7) Couldn't connect to server` even though Docker reports those
+  bindings and the container-internal endpoints are healthy. Treat host port
+  access from WSL as an environment-specific Docker Desktop caveat.
