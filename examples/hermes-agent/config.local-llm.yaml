@@ -1,0 +1,39 @@
+# Minimal non-secret Hermes-agent runtime config for this repository's local
+# OpenAI-compatible gateway.
+model:
+  provider: custom
+  default: qwen3.5-2b-ud-q4-k-xl
+  base_url: http://host.docker.internal:18080/v1
+  api_key: local-not-required
+
+providers: {}
+fallback_providers: []
+group_sessions_per_user: true
+toolsets:
+  - hermes-cli
+
+agent:
+  max_turns: 90
+  gateway_timeout: 1800
+  restart_drain_timeout: 180
+  api_max_retries: 3
+
+terminal:
+  backend: docker
+  cwd: .
+  timeout: 180
+  docker_image: nikolaik/python-nodejs:python3.11-nodejs20
+  docker_mount_cwd_to_workspace: false
+  container_cpu: 1.0
+  container_memory: 5120
+  container_disk: 51200
+  container_persistent: true
+  persistent_shell: true
+
+display:
+  streaming: false
+  show_reasoning: false
+  timestamps: false
+
+checkpoints:
+  enabled: false

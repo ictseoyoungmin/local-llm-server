@@ -17,7 +17,7 @@ Hermes-only runtime.
 
 ## Full Hermes Runtime Shape
 
-The local Hermes runtime uses:
+The full Hermes runtime uses:
 
 ```text
 image: nousresearch/hermes-agent:latest
@@ -25,6 +25,26 @@ command: ["gateway", "run"]
 data volume: ./.hermes -> /opt/data
 API server: 127.0.0.1:8642
 dashboard: 127.0.0.1:9119
+```
+
+This repository includes a non-secret example compose file:
+
+```text
+docker-compose.hermes-runtime.example.yml
+```
+
+Initialize the example runtime state with:
+
+```bash
+./scripts/run_hermes_runtime_example.sh init
+```
+
+That creates gitignored local files:
+
+```text
+.env.hermes-runtime
+.hermes-runtime-example/config.yaml
+.hermes-runtime-example/SOUL.md
 ```
 
 The runtime also mounts Docker access for Hermes terminal tooling:
@@ -116,6 +136,20 @@ cd /mnt/f/NowWorking/hermes-agent
 docker compose up -d
 ```
 
+Or start the example runtime from this repository:
+
+```bash
+./scripts/run_hermes_runtime_example.sh up
+```
+
+If an existing Hermes runtime already binds `8642` or `9119`, edit the
+generated `.env.hermes-runtime` before `up`:
+
+```env
+HERMES_API_PORT=18642
+HERMES_DASHBOARD_PORT=19119
+```
+
 Check Hermes gateway readiness:
 
 ```bash
@@ -143,6 +177,12 @@ the `hermes` container. Use the runtime smoke script for the end-to-end check:
 
 ```bash
 ./scripts/smoke_hermes_runtime.sh
+```
+
+For the example runtime managed by this repo, the wrapper command is:
+
+```bash
+./scripts/run_hermes_runtime_example.sh smoke
 ```
 
 ## Next Verification Slice

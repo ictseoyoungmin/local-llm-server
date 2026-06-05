@@ -205,6 +205,14 @@ for the compatibility contract and current caveats.
 For operating the full Hermes gateway container, see
 [docs/specs/hermes-agent-runtime-integration.md](docs/specs/hermes-agent-runtime-integration.md).
 
+This repository also includes a full Hermes gateway example:
+
+```bash
+./scripts/run_hermes_runtime_example.sh init
+./scripts/run_hermes_runtime_example.sh up
+./scripts/run_hermes_runtime_example.sh smoke
+```
+
 Recommended provider environment variables:
 
 ```env

@@ -3,7 +3,13 @@
 These files are non-secret snippets for connecting a full Hermes-agent runtime
 to this project's gateway.
 
-They are not a replacement for the Hermes runtime repository at:
+Two integration modes exist:
+
+- `docker-compose.hermes-agent.yml`: short one-shot CLI smoke container.
+- `docker-compose.hermes-runtime.example.yml`: full Hermes gateway runtime
+  example with API server and dashboard.
+
+They are not a replacement for an existing Hermes runtime repository such as:
 
 ```text
 /mnt/f/NowWorking/hermes-agent
@@ -11,3 +17,49 @@ They are not a replacement for the Hermes runtime repository at:
 
 Use them as references only. Back up the live Hermes config before applying any
 snippet.
+
+## Full Runtime Example
+
+Initialize local runtime files:
+
+```bash
+./scripts/run_hermes_runtime_example.sh init
+```
+
+This creates gitignored files:
+
+```text
+.env.hermes-runtime
+.hermes-runtime-example/config.yaml
+.hermes-runtime-example/SOUL.md
+```
+
+The compose project name defaults to `local-llm-hermes-runtime`, so it stays
+separate from this repository's main `llama` and `gateway` compose stack.
+
+Start the full Hermes gateway runtime:
+
+```bash
+./scripts/run_hermes_runtime_example.sh up
+```
+
+If another Hermes runtime already uses ports `8642` or `9119`, edit
+`.env.hermes-runtime` before starting:
+
+```env
+HERMES_CONTAINER_NAME=local-llm-hermes
+HERMES_API_PORT=18642
+HERMES_DASHBOARD_PORT=19119
+```
+
+Smoke test through the Hermes API server:
+
+```bash
+./scripts/run_hermes_runtime_example.sh smoke
+```
+
+Stop it:
+
+```bash
+./scripts/run_hermes_runtime_example.sh down
+```
