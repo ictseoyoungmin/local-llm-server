@@ -14,5 +14,8 @@ hermes-agent-smoke/*
 .env.hermes-runtime.backup.*
 .hermes-runtime-example/
 .env.hermes-bind-test
+.env.hermes-bind-host-uid
 .hermes-runtime-bind-test/
+.hermes-runtime-bind-host-uid/
 .hermes-storage-probe/
+.hermes-storage-probe-uid1000/

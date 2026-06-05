@@ -3,14 +3,20 @@ set -euo pipefail
 
 IMAGE="${HERMES_AGENT_IMAGE:-nousresearch/hermes-agent:latest}"
 ROOT="${HERMES_STORAGE_PROBE_DIR:-.hermes-storage-probe}"
+PROBE_UID="${HERMES_STORAGE_PROBE_UID:-10000}"
+PROBE_GID="${HERMES_STORAGE_PROBE_GID:-10000}"
 
 usage() {
   cat <<'EOF'
 Usage:
   ./scripts/verify_host_storage_primitives.sh
 
-Runs a small file/SQLite probe from inside the Hermes-agent image as uid/gid
-10000:10000 against host bind-mounted directories.
+Runs a small file/SQLite probe from inside the Hermes-agent image against host
+bind-mounted directories.
+
+Environment:
+  HERMES_STORAGE_PROBE_UID=10000
+  HERMES_STORAGE_PROBE_GID=10000
 
 Cases:
   default-755: host-created directory with mode 755
@@ -28,10 +34,11 @@ run_case() {
 
   echo "== ${name} =="
   stat -c 'host path=%n uid=%u gid=%g mode=%a fs=%T' "${path}" || true
+  echo "probe uid/gid=${PROBE_UID}:${PROBE_GID}"
 
   docker run --rm -i \
     --entrypoint /opt/hermes/.venv/bin/python \
-    --user 10000:10000 \
+    --user "${PROBE_UID}:${PROBE_GID}" \
     -v "$(pwd)/${path}:/data" \
     "${IMAGE}" \
     - <<'PY'

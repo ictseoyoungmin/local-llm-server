@@ -218,6 +218,7 @@ whether a host filesystem is safe for `/opt/data`, run:
 
 ```bash
 ./scripts/verify_hermes_bind_data.sh run
+./scripts/verify_hermes_bind_data.sh run-host-uid
 ./scripts/verify_host_storage_primitives.sh
 ```
 
