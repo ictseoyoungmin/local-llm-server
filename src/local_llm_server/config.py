@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     public_model_name: str = "local-llama"
     local_llm_api_key: str = "local-not-required"
     request_timeout_seconds: float = 600.0
+    sanitize_llama_cpp_requests: bool = True
 
     @property
     def upstream_base_url(self) -> str:

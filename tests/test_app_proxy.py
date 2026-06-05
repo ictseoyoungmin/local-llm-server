@@ -10,6 +10,7 @@ class DummySettings:
     local_llm_api_key = "secret"
     public_model_name = "test-model"
     request_timeout_seconds = 1.0
+    sanitize_llama_cpp_requests = True
     upstream_base_url = "http://upstream.test/v1"
 
 
@@ -39,6 +40,44 @@ def test_api_key_allows_expected_authorization(monkeypatch):
 )
 def test_stream_request_detection(body, expected):
     assert app_module._is_stream_request(body) is expected
+
+
+def test_llama_cpp_sanitizer_removes_ollama_specific_fields(monkeypatch):
+    monkeypatch.setattr(app_module, "settings", DummySettings())
+    body = (
+        b'{"model":"m","messages":[],"extra_body":{"options":{"num_ctx":200192}},'
+        b'"options":{"num_ctx":200192},"num_ctx":200192,"stream":false}'
+    )
+
+    sanitized_body, removed = app_module._prepare_upstream_body("/chat/completions", body)
+
+    assert removed == ["extra_body", "num_ctx", "options"]
+    assert b"extra_body" not in sanitized_body
+    assert b"options" not in sanitized_body
+    assert b"num_ctx" not in sanitized_body
+    assert b'"stream": false' in sanitized_body
+
+
+def test_llama_cpp_sanitizer_preserves_tools(monkeypatch):
+    monkeypatch.setattr(app_module, "settings", DummySettings())
+    body = b'{"model":"m","messages":[],"tools":[{"type":"function"}],"tool_choice":"auto"}'
+
+    sanitized_body, removed = app_module._prepare_upstream_body("/chat/completions", body)
+
+    assert removed == []
+    assert sanitized_body == body
+
+
+def test_llama_cpp_sanitizer_can_be_disabled(monkeypatch):
+    settings = DummySettings()
+    settings.sanitize_llama_cpp_requests = False
+    monkeypatch.setattr(app_module, "settings", settings)
+    body = b'{"model":"m","messages":[],"options":{"num_ctx":200192}}'
+
+    sanitized_body, removed = app_module._prepare_upstream_body("/chat/completions", body)
+
+    assert removed == []
+    assert sanitized_body == body
 
 
 @pytest.mark.asyncio

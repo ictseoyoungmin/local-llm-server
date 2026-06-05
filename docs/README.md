@@ -46,6 +46,10 @@ selected GGUF and warms up the configured context.
 Use these docs first:
 
 - `specs/local-model-switching.md`: switching contract and profile list.
+- `specs/hermes-agent-llama-cpp-compatibility.md`: Hermes custom endpoint,
+  gateway sanitizer, and Docker smoke container contract.
 - `verification/llama-runtime-compatibility.md`: llama.cpp version and model
   compatibility matrix.
+- `verification/hermes-agent-compatibility.md`: observed Hermes-agent
+  container connection results.
 - `verification/benchmarks/`: benchmark records and comparison notes.

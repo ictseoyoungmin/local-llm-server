@@ -8,3 +8,5 @@ data/
 models/
 logs/
 docs/verification/benchmarks/results/*.jsonl
+hermes-agent-smoke/*
+!hermes-agent-smoke/config.yaml

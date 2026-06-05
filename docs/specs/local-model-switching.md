@@ -82,8 +82,7 @@ Check the active server:
 Run a Hermes-agent style provider smoke test:
 
 ```bash
-OPENAI_BASE_URL=http://host.docker.internal:18080/v1 \
-OPENAI_MODEL=<current PUBLIC_MODEL_NAME> \
+HERMES_AGENT_MODEL=<current PUBLIC_MODEL_NAME> \
 ./scripts/smoke_hermes_agent.sh
 ```
 
@@ -165,14 +164,17 @@ MTP compose override: disabled
 Hermes-agent should not depend on the concrete GGUF filename. It should only
 configure:
 
-```env
-OPENAI_BASE_URL=http://host.docker.internal:18080/v1
-OPENAI_API_KEY=local-not-required
-OPENAI_MODEL=<current PUBLIC_MODEL_NAME>
+```yaml
+model:
+  provider: custom
+  default: <current PUBLIC_MODEL_NAME>
+  base_url: http://host.docker.internal:18080/v1
+  api_key: local-not-required
 ```
 
 The model profile owns `PUBLIC_MODEL_NAME`. If Hermes-agent validates model IDs,
-update `OPENAI_MODEL` after switching profiles.
+update `model.default` or pass `HERMES_AGENT_MODEL` to the smoke script after
+switching profiles.
 
 Before wiring a selected profile into Hermes-agent workflows, run:
 
@@ -180,8 +182,10 @@ Before wiring a selected profile into Hermes-agent workflows, run:
 ./scripts/smoke_hermes_agent.sh
 ```
 
-Use the default `host.docker.internal` URL from inside Docker, or override
-`OPENAI_BASE_URL=http://127.0.0.1:18080/v1` for host-only development.
+The smoke script uses `hermes-agent-smoke/config.yaml` and the official
+`nousresearch/hermes-agent` Docker image. For host-only development without the
+Hermes container, call `http://127.0.0.1:18080/v1` directly with an
+OpenAI-compatible client.
 
 ## MTP Constraints
 

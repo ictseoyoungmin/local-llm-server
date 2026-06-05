@@ -1,0 +1,22 @@
+services:
+  hermes-agent-smoke:
+    image: ${HERMES_AGENT_IMAGE:-nousresearch/hermes-agent:latest}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      HERMES_ACCEPT_HOOKS: "1"
+    volumes:
+      - ./hermes-agent-smoke:/opt/data
+      - .:/workspace:ro
+    working_dir: /workspace
+    entrypoint:
+      - /opt/hermes/.venv/bin/hermes
+    command:
+      - --accept-hooks
+      - --yolo
+      - --provider
+      - custom
+      - --model
+      - "${HERMES_AGENT_MODEL:-gemma-4-E2B-it-Q4_K_M}"
+      - -z
+      - "${HERMES_AGENT_PROMPT:-Reply exactly: hermes local provider ready}"

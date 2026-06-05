@@ -163,6 +163,42 @@ provider. Keep provider-specific code in the consuming project small and
 config-driven, so switching between hosted APIs and this local server only
 changes environment variables.
 
+### Hermes-agent
+
+Hermes-agent is configured as a custom self-hosted provider. For Dockerized
+Hermes, use the gateway address from inside a container:
+
+```yaml
+model:
+  provider: custom
+  default: gemma-4-E2B-it-Q4_K_M
+  base_url: http://host.docker.internal:18080/v1
+  api_key: local-not-required
+```
+
+This repository keeps a runnable smoke container at:
+
+```bash
+./scripts/smoke_hermes_agent.sh
+```
+
+The script checks the gateway sanitizer and then runs the official
+`nousresearch/hermes-agent:latest` image through
+`docker-compose.hermes-agent.yml`.
+
+Hermes Docker integrations should use the gateway port, not the raw llama.cpp
+port. The gateway strips known llama.cpp-incompatible request fields such as
+`extra_body`, `options`, and `num_ctx`, while preserving `tools` payloads for
+agent workflows. Disable this only for debugging:
+
+```env
+SANITIZE_LLAMA_CPP_REQUESTS=false
+```
+
+See
+[docs/specs/hermes-agent-llama-cpp-compatibility.md](docs/specs/hermes-agent-llama-cpp-compatibility.md)
+for the compatibility contract and current caveats.
+
 Recommended provider environment variables:
 
 ```env
@@ -484,17 +520,20 @@ LLAMA_BASE_URL=http://127.0.0.1:18080/v1
 
 ### hermes-agent
 
-Inside the Hermes container, point an OpenAI-compatible provider at:
+Inside the Hermes container, configure a custom provider:
 
-```text
-http://host.docker.internal:18080/v1
+```yaml
+model:
+  provider: custom
+  default: gemma-4-E2B-it-Q4_K_M
+  base_url: http://host.docker.internal:18080/v1
+  api_key: local-not-required
 ```
 
-Use:
+Run the maintained smoke container from this repository:
 
-```text
-api_key=local-not-required
-model=gemma-4-local
+```bash
+HERMES_AGENT_MODEL=gemma-4-E2B-it-Q4_K_M ./scripts/smoke_hermes_agent.sh
 ```
 
 ### Dacon-Fin-Agent

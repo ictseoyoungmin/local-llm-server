@@ -14,6 +14,8 @@ from .config import get_settings
 settings = get_settings()
 app = FastAPI(title="Local LLM Server", version="0.1.0")
 
+LLAMA_CPP_UNSUPPORTED_FIELDS = frozenset({"extra_body", "options", "num_ctx"})
+
 
 def _check_api_key(authorization: str | None) -> None:
     if settings.local_llm_api_key in {"", "local-not-required"}:
@@ -38,6 +40,38 @@ def _is_stream_request(body: bytes) -> bool:
     except (UnicodeDecodeError, json.JSONDecodeError):
         return False
     return isinstance(payload, dict) and payload.get("stream") is True
+
+
+def _sanitize_payload_for_llama_cpp(path: str, payload: Any) -> tuple[Any, list[str]]:
+    if path not in {"/chat/completions", "/completions", "/embeddings"}:
+        return payload, []
+    if not isinstance(payload, dict):
+        return payload, []
+
+    sanitized = dict(payload)
+    removed: list[str] = []
+    for key in LLAMA_CPP_UNSUPPORTED_FIELDS:
+        if key in sanitized:
+            sanitized.pop(key)
+            removed.append(key)
+
+    return sanitized, sorted(removed)
+
+
+def _prepare_upstream_body(path: str, body: bytes) -> tuple[bytes, list[str]]:
+    if not settings.sanitize_llama_cpp_requests:
+        return body, []
+
+    try:
+        payload = json.loads(body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return body, []
+
+    sanitized, removed = _sanitize_payload_for_llama_cpp(path, payload)
+    if not removed:
+        return body, []
+
+    return json.dumps(sanitized, ensure_ascii=False).encode("utf-8"), removed
 
 
 def _upstream_url(path: str, request: Request | None = None) -> str:
@@ -92,10 +126,16 @@ async def proxy_v1(
         return JSONResponse(status_code=status_code, content=payload)
 
     body = await request.body()
+    body, removed_fields = _prepare_upstream_body(upstream_path, body)
     if _is_stream_request(body):
         return StreamingResponse(
             _stream_upstream(upstream_path, body, request),
             media_type="text/event-stream",
+            headers={
+                "X-Local-LLM-Sanitized-Fields": ",".join(removed_fields),
+            }
+            if removed_fields
+            else None,
         )
 
     async with httpx.AsyncClient(timeout=timeout) as client:
@@ -109,7 +149,8 @@ async def proxy_v1(
         payload = response.json()
     except ValueError:
         payload = {"detail": response.text}
-    return JSONResponse(status_code=response.status_code, content=payload)
+    headers = {"X-Local-LLM-Sanitized-Fields": ",".join(removed_fields)} if removed_fields else None
+    return JSONResponse(status_code=response.status_code, content=payload, headers=headers)
 
 
 async def _stream_upstream(path: str, body: bytes, request: Request) -> AsyncIterator[bytes]:

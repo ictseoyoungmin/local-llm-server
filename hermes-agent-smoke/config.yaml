@@ -1,0 +1,6 @@
+model:
+  provider: custom
+  default: gemma-4-E2B-it-Q4_K_M
+  base_url: http://host.docker.internal:18080/v1
+  api_key: local-not-required
+hooks_auto_accept: true

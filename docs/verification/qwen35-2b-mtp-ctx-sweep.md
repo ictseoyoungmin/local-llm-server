@@ -160,8 +160,7 @@ VRAM fallback profile.
 Script:
 
 ```bash
-OPENAI_BASE_URL=http://127.0.0.1:18080/v1 \
-OPENAI_MODEL=qwen3.5-2b-mtp-ud-q4-k-xl-kv-q8 \
+HERMES_AGENT_MODEL=qwen3.5-2b-mtp-ud-q4-k-xl-kv-q8 \
 ./scripts/smoke_hermes_agent.sh
 ```
 
@@ -172,9 +171,10 @@ response: hermes local provider ready
 status: OK
 ```
 
-The script defaults to `http://host.docker.internal:18080/v1` for Dockerized
-Hermes-agent use. Use the host URL override above when running the smoke test
-directly from the host.
+This historic smoke result was a direct provider request before the dedicated
+Hermes-agent Docker smoke container was added. Current Hermes-agent
+compatibility runs are recorded in
+`docs/verification/hermes-agent-compatibility.md`.
 
 ## MTP On/Off Long Benchmark
 

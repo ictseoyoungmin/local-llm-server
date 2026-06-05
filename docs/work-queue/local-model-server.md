@@ -14,6 +14,10 @@
   Hermes-routing benchmarks.
 - [x] Add a Hermes-agent smoke test that calls
   `http://host.docker.internal:18080/v1`.
+- [x] Add gateway sanitizer for Hermes/Ollama-style request fields that
+  llama.cpp rejects.
+- [x] Run the official Hermes-agent Docker smoke container against the rebuilt
+  gateway and record the result.
 
 ## Next
 
@@ -26,6 +30,8 @@
   explicitly with `scripts/export_model_profile_env.sh`.
 - [x] Add Qwen Q8 profile if Q4 XL quality is insufficient. Profile added as a
   quality fallback; default remains non-MTP Q4 XL based on current benchmarks.
+- [ ] Run an end-to-end Hermes tool workflow and record whether llama.cpp
+  honors tool schemas for the selected profile/runtime.
 
 ## Later
 

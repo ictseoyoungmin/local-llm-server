@@ -39,6 +39,7 @@ services:
       PUBLIC_MODEL_NAME: ${PUBLIC_MODEL_NAME:-local-llama}
       LOCAL_LLM_API_KEY: ${LOCAL_LLM_API_KEY:-local-not-required}
       REQUEST_TIMEOUT_SECONDS: ${REQUEST_TIMEOUT_SECONDS:-600}
+      SANITIZE_LLAMA_CPP_REQUESTS: ${SANITIZE_LLAMA_CPP_REQUESTS:-true}
     ports:
       - "127.0.0.1:18080:8000"
     depends_on:
