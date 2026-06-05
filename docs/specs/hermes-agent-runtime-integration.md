@@ -114,7 +114,14 @@ strategy: it mounts `.hermes` as `/opt/data` and sets `HERMES_UID=1000` and
 alignment passes basic file and SQLite probes. The wrapper-based host-uid test
 still failed because the wrapper stalled while changing ownership of
 `/opt/hermes/.venv`, but `docker-compose.hermes-local-llm.yml` bypasses that
-wrapper and passed a full gateway smoke as `user: 1000:1000`.
+wrapper and passed a full gateway smoke as `user: 1000:1000`. Use:
+
+```bash
+./scripts/run_hermes_runtime_example.sh init-hostuid
+./scripts/run_hermes_runtime_example.sh up-hostuid
+./scripts/run_hermes_runtime_example.sh smoke-hostuid
+./scripts/run_hermes_runtime_example.sh down-hostuid
+```
 
 Environment-specific storage results are tracked in
 `docs/verification/hermes-storage-compatibility.md`. Add new filesystem results

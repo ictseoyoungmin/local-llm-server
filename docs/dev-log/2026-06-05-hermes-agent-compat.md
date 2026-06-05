@@ -81,3 +81,16 @@ hermes gateway local llm ready
   - wrapper-based host-uid mode still stalls while changing ownership of
     `/opt/hermes/.venv`;
   - direct-entrypoint host-uid mode works on this WSL/DrvFS host.
+
+2026-06-05 19:34-19:35 KST:
+
+- Added hostuid subcommands to `scripts/run_hermes_runtime_example.sh`:
+  `init-hostuid`, `up-hostuid`, `smoke-hostuid`, `status-hostuid`,
+  `down-hostuid`, and `logs-hostuid`.
+- Verified the new wrapper interface:
+  - `up-hostuid` started `local-llm-hermes-local-hostuid`;
+  - `smoke-hostuid` returned `hermes gateway local llm ready`;
+  - `status-hostuid` showed ports `48642->8642` and `49119->9119`;
+  - `down-hostuid` stopped and removed the container/network.
+- Smoke usage was `prompt_tokens=14402`, `completion_tokens=29`,
+  `total_tokens=14431`.

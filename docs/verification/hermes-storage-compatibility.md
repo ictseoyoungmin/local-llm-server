@@ -30,10 +30,10 @@ Host bind mount with host uid/gid and direct Hermes entrypoint, using
 `docker-compose.hermes-local-llm.yml`:
 
 ```bash
-cp examples/hermes-agent/hermes-local-llm.hostuid.env.example .env.hermes-local-llm-hostuid
-docker compose -f docker-compose.hermes-local-llm.yml --env-file .env.hermes-local-llm-hostuid up -d
-HERMES_CONTAINER=local-llm-hermes-local-hostuid ./scripts/smoke_hermes_runtime.sh
-docker compose -f docker-compose.hermes-local-llm.yml --env-file .env.hermes-local-llm-hostuid down
+./scripts/run_hermes_runtime_example.sh init-hostuid
+./scripts/run_hermes_runtime_example.sh up-hostuid
+./scripts/run_hermes_runtime_example.sh smoke-hostuid
+./scripts/run_hermes_runtime_example.sh down-hostuid
 ```
 
 Host storage primitive probe:
@@ -71,6 +71,7 @@ That directory is intentionally gitignored.
 | 2026-06-05 17:39-17:47 KST | Windows 11 + WSL2 Ubuntu 22.04 + Docker Desktop | `./.hermes-runtime-bind-test` on `/mnt/f` | DrvFS / Windows drive bind mount | host bind -> `/opt/data` | `nousresearch/hermes-agent:latest` `sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33` | Failed | `./scripts/verify_hermes_bind_data.sh run` started `local-llm-hermes-bind-test`, but `./scripts/smoke_hermes_runtime.sh` timed out after 120s and again after 60s on rerun. Container stayed running with log `Fixing ownership of /opt/data to hermes (10000)`. Process table showed root process stuck in `chown -R hermes:hermes /opt/hermes/.venv`. |
 | 2026-06-05 18:10-18:13 KST | Windows 11 + WSL2 Ubuntu 22.04 + Docker Desktop | `./.hermes-runtime-bind-host-uid` on `/mnt/f` | DrvFS / Windows drive bind mount | host bind -> `/opt/data`; `HERMES_UID=1000`, `HERMES_GID=1000` | `nousresearch/hermes-agent:latest` `sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33` | Failed at gateway wrapper | This matches the storage pattern used by `F:\NowWorking\hermes-agent`: host `.hermes` bind mount plus uid/gid 1000. The container created `/opt/data` directories and files as host user `ymin`, but the API server did not become ready within 180s. Logs stopped at `Changing hermes UID to 1000`, `Changing hermes GID to 1000`, `Fixing ownership of /opt/data to hermes (1000)`. Process table showed root process stuck in `chown -R hermes:hermes /opt/hermes/.venv`. |
 | 2026-06-05 19:20-19:23 KST | Windows 11 + WSL2 Ubuntu 22.04 + Docker Desktop | `./.hermes-local-llm-hostuid` on `/mnt/f` | DrvFS / Windows drive bind mount | host bind -> `/opt/data`; compose `user: 1000:1000`; direct `/opt/hermes/.venv/bin/hermes gateway run` entrypoint | `nousresearch/hermes-agent:latest` `sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33` | OK | `docker-compose.hermes-local-llm.yml` with `.env.hermes-local-llm-hostuid` avoided the official wrapper ownership path. `HERMES_CONTAINER=local-llm-hermes-local-hostuid ./scripts/smoke_hermes_runtime.sh` returned `hermes gateway local llm ready`; usage `prompt_tokens=14402`, `completion_tokens=41`, `total_tokens=14443`. Data files including `state.db`, `state.db-wal`, `response_store.db`, `response_store.db-wal`, `kanban.db`, and `sessions/session_api-...json` were created as host user `ymin`. |
+| 2026-06-05 19:34-19:35 KST | Windows 11 + WSL2 Ubuntu 22.04 + Docker Desktop | `./.hermes-local-llm-hostuid` on `/mnt/f` | DrvFS / Windows drive bind mount | same hostuid direct-entrypoint mode managed by `scripts/run_hermes_runtime_example.sh` | `nousresearch/hermes-agent:latest` `sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33` | OK | New wrapper commands `up-hostuid`, `smoke-hostuid`, `status-hostuid`, and `down-hostuid` were verified. `smoke-hostuid` returned `hermes gateway local llm ready`; usage `prompt_tokens=14402`, `completion_tokens=29`, `total_tokens=14431`. |
 
 ## Primitive Probe Results
 

@@ -84,3 +84,24 @@ Stop it:
 ```bash
 ./scripts/run_hermes_runtime_example.sh down
 ```
+
+## Host UID Runtime Example
+
+For a host-bound `/opt/data` directory on WSL/DrvFS, use the hostuid commands.
+This mode copies `hermes-local-llm.hostuid.env.example` to the gitignored
+`.env.hermes-local-llm-hostuid`, runs the container as `1000:1000`, and uses
+`docker-compose.hermes-local-llm.yml` to bypass the official wrapper ownership
+step.
+
+```bash
+./scripts/run_hermes_runtime_example.sh init-hostuid
+./scripts/run_hermes_runtime_example.sh up-hostuid
+./scripts/run_hermes_runtime_example.sh smoke-hostuid
+./scripts/run_hermes_runtime_example.sh down-hostuid
+```
+
+Runtime state is stored in:
+
+```text
+.hermes-local-llm-hostuid/
+```
