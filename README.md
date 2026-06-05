@@ -3,6 +3,10 @@
 Shared local LLM hosting service for projects that need a llama.cpp-backed,
 OpenAI-compatible endpoint.
 
+This is not a Hermes-agent-only project. Hermes-agent is one consumer with a
+dedicated compatibility smoke test; the stable contract for every consumer is
+the OpenAI-compatible gateway at `http://127.0.0.1:18080/v1`.
+
 Target consumers:
 
 - `F:\Fin_Project\2026\gemma4-tutor`
@@ -198,6 +202,8 @@ SANITIZE_LLAMA_CPP_REQUESTS=false
 See
 [docs/specs/hermes-agent-llama-cpp-compatibility.md](docs/specs/hermes-agent-llama-cpp-compatibility.md)
 for the compatibility contract and current caveats.
+For operating the full Hermes gateway container, see
+[docs/specs/hermes-agent-runtime-integration.md](docs/specs/hermes-agent-runtime-integration.md).
 
 Recommended provider environment variables:
 

@@ -6,6 +6,9 @@ Hermes-agent should be able to use this project as a local, switchable model
 backend without coupling itself to llama.cpp flags, GGUF paths, or model
 download details.
 
+This is a consumer-specific compatibility contract. The Local LLM Server itself
+remains a shared OpenAI-compatible gateway for multiple consumers.
+
 ## Supported Integration
 
 Use Hermes-agent's custom self-hosted provider:
@@ -129,6 +132,10 @@ changing ownership of its internal virtual environment before the one-shot
 command could start. Do not apply this shortcut to a long-running Hermes
 gateway container; the official wrapper is still the correct path for that
 mode.
+
+For full Hermes gateway mode, use the operational notes in
+`docs/specs/hermes-agent-runtime-integration.md`. The smoke container is not a
+replacement for that runtime.
 
 Record results in:
 

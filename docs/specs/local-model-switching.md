@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Hermes-agent should use a stable OpenAI-compatible endpoint while this project
+Consumers should use a stable OpenAI-compatible endpoint while this project
 handles local model selection, runtime options, and llama.cpp server lifecycle.
 
 Stable endpoint:

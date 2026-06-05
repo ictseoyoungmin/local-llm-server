@@ -1,0 +1,8 @@
+# Non-secret Hermes-agent model provider snippet.
+# Merge this into /mnt/f/NowWorking/hermes-agent/.hermes/config.yaml after
+# backing up the existing file. Do not copy secrets or auth state into this repo.
+model:
+  provider: custom
+  default: qwen3.5-2b-ud-q4-k-xl
+  base_url: http://host.docker.internal:18080/v1
+  api_key: local-not-required

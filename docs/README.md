@@ -9,10 +9,14 @@
 
 ## Current Focus
 
-The active planning target is a local model switching interface for Hermes-agent.
-Hermes-agent should keep using a stable OpenAI-compatible endpoint while this
+The active planning target is a shared local model switching interface.
+Consumers should keep using a stable OpenAI-compatible endpoint while this
 project owns model profiles, llama.cpp runtime settings, and update/rollback
 workflows.
+
+Hermes-agent has dedicated compatibility docs because it is the highest-friction
+consumer so far. Those docs are consumer-specific and do not redefine the
+project scope.
 
 Benchmark records live under `verification/benchmarks/` and should be appended
 for every meaningful runtime change.
@@ -48,6 +52,8 @@ Use these docs first:
 - `specs/local-model-switching.md`: switching contract and profile list.
 - `specs/hermes-agent-llama-cpp-compatibility.md`: Hermes custom endpoint,
   gateway sanitizer, and Docker smoke container contract.
+- `specs/hermes-agent-runtime-integration.md`: non-sensitive operational notes
+  imported from the local Hermes runtime repo.
 - `verification/llama-runtime-compatibility.md`: llama.cpp version and model
   compatibility matrix.
 - `verification/hermes-agent-compatibility.md`: observed Hermes-agent
