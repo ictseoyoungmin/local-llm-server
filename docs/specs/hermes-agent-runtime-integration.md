@@ -150,6 +150,14 @@ HERMES_API_PORT=18642
 HERMES_DASHBOARD_PORT=19119
 ```
 
+The wrapper checks these ports before `docker compose up` and exits with a
+clear message if they are already allocated. If Docker already created a failed
+example container, clean it with:
+
+```bash
+./scripts/run_hermes_runtime_example.sh down
+```
+
 Check Hermes gateway readiness:
 
 ```bash

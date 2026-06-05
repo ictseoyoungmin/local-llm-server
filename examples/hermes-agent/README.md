@@ -52,6 +52,13 @@ HERMES_API_PORT=18642
 HERMES_DASHBOARD_PORT=19119
 ```
 
+If `up` already failed with `port is already allocated`, clean the failed
+container before retrying:
+
+```bash
+./scripts/run_hermes_runtime_example.sh down
+```
+
 Smoke test through the Hermes API server:
 
 ```bash

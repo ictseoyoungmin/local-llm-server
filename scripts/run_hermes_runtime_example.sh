@@ -56,6 +56,93 @@ load_env_file() {
   fi
 }
 
+env_value() {
+  local key="$1"
+  local default="$2"
+  if [[ -f "${ENV_FILE}" ]]; then
+    local value
+    value="$(sed -n "s/^${key}=//p" "${ENV_FILE}" | tail -1)"
+    if [[ -n "${value}" ]]; then
+      printf '%s\n' "${value}"
+      return
+    fi
+  fi
+  printf '%s\n' "${default}"
+}
+
+port_is_listening() {
+  local port="$1"
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltn "sport = :${port}" | grep -q ":${port}"
+    return
+  fi
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -iTCP:"${port}" -sTCP:LISTEN >/dev/null 2>&1
+    return
+  fi
+  python3 - "${port}" <<'PY'
+import socket
+import sys
+
+port = int(sys.argv[1])
+with socket.socket() as sock:
+    sock.settimeout(0.25)
+    raise SystemExit(0 if sock.connect_ex(("127.0.0.1", port)) == 0 else 1)
+PY
+}
+
+container_is_running() {
+  local container="$1"
+  [[ "$(docker inspect -f '{{.State.Running}}' "${container}" 2>/dev/null || true)" == "true" ]]
+}
+
+preflight_ports() {
+  local container_name api_port dashboard_port
+  container_name="$(env_value HERMES_CONTAINER_NAME local-llm-hermes)"
+  api_port="$(env_value HERMES_API_PORT 8642)"
+  dashboard_port="$(env_value HERMES_DASHBOARD_PORT 9119)"
+
+  local conflict=0
+  if port_is_listening "${api_port}" && ! container_is_running "${container_name}"; then
+    echo "Port ${api_port} is already in use, and ${container_name} is not running." >&2
+    conflict=1
+  fi
+  if port_is_listening "${dashboard_port}" && ! container_is_running "${container_name}"; then
+    echo "Port ${dashboard_port} is already in use, and ${container_name} is not running." >&2
+    conflict=1
+  fi
+
+  if [[ "${conflict}" -ne 0 ]]; then
+    cat >&2 <<EOF
+Edit ${ENV_FILE} before starting, for example:
+  HERMES_API_PORT=18642
+  HERMES_DASHBOARD_PORT=19119
+
+If a failed example container is left behind, run:
+  ./scripts/run_hermes_runtime_example.sh down
+EOF
+    exit 7
+  fi
+}
+
+require_running_container() {
+  local container_name
+  container_name="$(env_value HERMES_CONTAINER_NAME local-llm-hermes)"
+  if ! container_is_running "${container_name}"; then
+    cat >&2 <<EOF
+Hermes example container '${container_name}' is not running.
+
+Start it with:
+  ./scripts/run_hermes_runtime_example.sh up
+
+If startup failed because ports are already allocated, edit ${ENV_FILE}:
+  HERMES_API_PORT=18642
+  HERMES_DASHBOARD_PORT=19119
+EOF
+    exit 8
+  fi
+}
+
 command="${1:-}"
 case "${command}" in
   init)
@@ -63,6 +150,7 @@ case "${command}" in
     ;;
   up)
     init_runtime
+    preflight_ports
     compose up -d
     ;;
   down)
@@ -73,6 +161,7 @@ case "${command}" in
     ;;
   smoke)
     load_env_file
+    require_running_container
     HERMES_CONTAINER="${HERMES_CONTAINER:-${HERMES_CONTAINER_NAME:-local-llm-hermes}}" \
       ./scripts/smoke_hermes_runtime.sh
     ;;
