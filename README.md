@@ -54,6 +54,55 @@ Run a chat smoke test:
 ./scripts/smoke_chat.sh
 ```
 
+## Model Profile Switching
+
+The standard model switching interface is:
+
+```bash
+./scripts/run_model_profile.sh list
+./scripts/run_model_profile.sh status
+./scripts/run_model_profile.sh qwen3.5-2b-q4-xl 130000
+./scripts/run_model_profile.sh gemma4-e2b-q4 130000
+```
+
+Profiles live in `model-profiles/*.env`. Each profile owns the model path,
+public model name, context size, GPU offload settings, and optional runtime
+features such as MTP.
+
+The public endpoint remains stable:
+
+```text
+http://127.0.0.1:18080/v1
+```
+
+Switching profiles is not zero-downtime. The script recreates the `llama` and
+`gateway` containers with:
+
+```text
+docker compose ... up -d --force-recreate --no-build
+```
+
+After switching, wait for health before sending agent traffic:
+
+```bash
+curl -fsS http://127.0.0.1:18080/v1/health
+```
+
+Current practical defaults:
+
+```bash
+# Fastest warm Hermes-agent style profile in current benchmarks
+./scripts/run_model_profile.sh qwen3.5-2b-q4-xl 130000
+
+# Gemma profile with its model-specific mmproj available under models/gemma4/
+./scripts/run_model_profile.sh gemma4-e2b-q4 130000
+```
+
+For compatibility by llama.cpp version and model, see
+[docs/verification/llama-runtime-compatibility.md](docs/verification/llama-runtime-compatibility.md).
+For the interface contract, see
+[docs/specs/local-model-switching.md](docs/specs/local-model-switching.md).
+
 ## Download Weights
 
 This project does not commit model weights. Put GGUF files under `./models` or

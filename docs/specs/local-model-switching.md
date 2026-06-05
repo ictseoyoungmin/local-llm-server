@@ -54,6 +54,19 @@ Start a profile:
 ./scripts/run_model_profile.sh qwen3.5-2b-mtp-q4-xl
 ```
 
+Switch from one loaded model to another:
+
+```bash
+./scripts/run_model_profile.sh qwen3.5-2b-q4-xl 130000
+./scripts/run_model_profile.sh gemma4-e2b-q4 130000
+```
+
+This keeps the public endpoint stable, but it is not an in-process model swap.
+The script recreates the `llama` and `gateway` containers using Docker Compose.
+Expect short downtime while llama.cpp loads the selected GGUF and completes
+warmup. Gemma at `LLAMA_CTX_SIZE=130000` can take roughly minutes to become
+healthy on the measured GTX 1660 6GB host.
+
 List profiles:
 
 ```bash
