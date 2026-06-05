@@ -76,6 +76,8 @@ Important non-secret environment patterns:
 
 ```text
 HERMES_HOME=/opt/data
+HERMES_UID=10000
+HERMES_GID=10000
 HOME=/tmp/hermes-browser
 PATH=/opt/hermes/.venv/bin:/opt/hermes/node_modules/.bin:/opt/data/.local/bin:...
 API_SERVER_ENABLED=true
@@ -89,6 +91,10 @@ HERMES_DASHBOARD_TUI=1
 
 `HOME=/tmp/hermes-browser` keeps browser daemon sockets and transient state off
 the Windows/WSL bind-mounted Hermes data directory. Preserve it in gateway mode.
+
+`HERMES_UID/HERMES_GID=10000` matches the official image's built-in `hermes`
+user. Overriding those values can trigger a slow recursive ownership change of
+the image's internal virtual environment before the API server starts.
 
 The one-shot smoke container in this repository bypasses the wrapper entrypoint
 only to avoid repeated ownership changes during short CLI tests. Do not use that

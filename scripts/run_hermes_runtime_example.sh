@@ -28,6 +28,8 @@ init_runtime() {
   if [[ ! -f "${ENV_FILE}" ]]; then
     cp "${ENV_TEMPLATE}" "${ENV_FILE}"
     echo "Created ${ENV_FILE}"
+  else
+    migrate_env_defaults
   fi
 
   if [[ ! -f "${DATA_DIR}/config.yaml" ]]; then
@@ -41,6 +43,28 @@ init_runtime() {
     printf '%s\n' '# Hermes Local Runtime' '' 'Use the configured local LLM gateway for this runtime.' > "${DATA_DIR}/SOUL.md"
     echo "Created ${DATA_DIR}/SOUL.md"
   fi
+}
+
+migrate_env_defaults() {
+  local tmp_file
+  tmp_file="$(mktemp)"
+  awk '
+    /^HERMES_UID=1000$/ { print "HERMES_UID=10000"; changed=1; next }
+    /^HERMES_GID=1000$/ { print "HERMES_GID=10000"; changed=1; next }
+    { print }
+    END { if (changed) exit 42 }
+  ' "${ENV_FILE}" > "${tmp_file}" || {
+    local status="$?"
+    if [[ "${status}" -eq 42 ]]; then
+      cp "${tmp_file}" "${ENV_FILE}"
+      echo "Updated ${ENV_FILE} HERMES_UID/HERMES_GID defaults to 10000"
+      rm -f "${tmp_file}"
+      return
+    fi
+    rm -f "${tmp_file}"
+    return "${status}"
+  }
+  rm -f "${tmp_file}"
 }
 
 compose() {

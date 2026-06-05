@@ -52,6 +52,11 @@ HERMES_API_PORT=18642
 HERMES_DASHBOARD_PORT=19119
 ```
 
+The example defaults `HERMES_UID/HERMES_GID` to `10000`, matching the official
+image's built-in `hermes` user. Setting these to a different user can make the
+entrypoint spend a long time recursively changing ownership of
+`/opt/hermes/.venv` before the API server starts.
+
 If `up` already failed with `port is already allocated`, clean the failed
 container before retrying:
 

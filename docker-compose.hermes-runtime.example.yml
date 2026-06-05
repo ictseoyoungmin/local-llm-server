@@ -19,8 +19,8 @@ services:
       - .env.hermes-runtime
 
     environment:
-      HERMES_UID: "${HERMES_UID:-1000}"
-      HERMES_GID: "${HERMES_GID:-1000}"
+      HERMES_UID: "${HERMES_UID:-10000}"
+      HERMES_GID: "${HERMES_GID:-10000}"
       HERMES_HOME: /opt/data
       HOME: /tmp/hermes-browser
       AGENT_BROWSER_EXECUTABLE_PATH: "${AGENT_BROWSER_EXECUTABLE_PATH:-}"
