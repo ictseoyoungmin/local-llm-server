@@ -122,7 +122,19 @@ hermes gateway local llm ready
   `total_tokens=14452`.
 - Container-internal checks returned 200 for both
   `http://127.0.0.1:8642/v1/health` and `http://127.0.0.1:9119/chat`.
-- WSL-side curl to Docker-published `127.0.0.1:48642/49119` failed with
-  `curl: (7) Couldn't connect to server` even though Docker reports those
-  bindings and the container-internal endpoints are healthy. Treat host port
-  access from WSL as an environment-specific Docker Desktop caveat.
+- A non-escalated Codex sandbox curl to Docker-published
+  `127.0.0.1:48642/49119` failed with `curl: (7) Couldn't connect to server`.
+  Later unrestricted curl showed this was a sandbox artifact, not a runtime
+  failure.
+
+2026-06-05 20:13-20:14 KST:
+
+- Rechecked host-published ports without the sandbox network restriction:
+  - `http://127.0.0.1:48642/v1/health` returned
+    `{"status": "ok", "platform": "hermes-agent"}`;
+  - `http://127.0.0.1:49119/chat` returned the dashboard HTML with status 200.
+- Re-ran `smoke-hostuid`; it returned `hermes gateway local llm ready` with
+  `prompt_tokens=14402`, `completion_tokens=48`, `total_tokens=14450`.
+- Conclusion: the fresh hostuid runtime and host-published API/dashboard ports
+  are healthy. The earlier connection-refused result was caused by the Codex
+  command sandbox.
