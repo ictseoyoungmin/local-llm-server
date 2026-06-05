@@ -249,6 +249,17 @@ GATEWAY_ALLOW_ALL_USERS=true
 `OPENAI_API_KEY=local-not-required` is a local placeholder for Hermes' custom
 OpenAI-compatible provider path, not a real external OpenAI credential.
 
+The hostuid runtime also mounts a writable TUI build directory:
+
+```env
+HERMES_TUI_DIST_DIR=./.hermes-local-llm-hostuid-ui-tui-dist
+```
+
+Hermes dashboard `/chat` starts an embedded PTY-backed TUI. Without this
+separate writable mount, the API smoke path can pass while the browser chat tab
+shows `Chat unavailable: 1` because the container user cannot rebuild
+`/opt/hermes/ui-tui/dist/entry.js` inside the image filesystem.
+
 Record environment results in
 [docs/verification/hermes-storage-compatibility.md](docs/verification/hermes-storage-compatibility.md).
 

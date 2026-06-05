@@ -160,3 +160,34 @@ hermes gateway local llm ready
   Discord, web search, and similar integrations.
 - Re-ran `smoke-hostuid`; it returned `hermes gateway local llm ready` with
   `prompt_tokens=14608`, `completion_tokens=33`, `total_tokens=14641`.
+
+## 20:55-20:59 KST - Fix Hostuid Browser Chat
+
+- Symptom: `http://localhost:49119/chat?resume=20260605_111558_c4f41d`
+  loaded the dashboard but the terminal showed `Chat unavailable: 1`.
+- Root cause:
+  - dashboard `/chat` uses `/api/pty`;
+  - `/api/pty` spawns the embedded Node TUI;
+  - Hermes rebuilds `ui-tui/dist/entry.js` before spawning;
+  - hostuid mode runs the container as uid/gid 1000, which cannot write inside
+    the image-owned `/opt/hermes/ui-tui/dist`.
+- Evidence before fix:
+  - container logs showed `TUI build failed`;
+  - esbuild failed with `permission denied` on
+    `/opt/hermes/ui-tui/dist/entry.js`;
+  - API smoke still passed, so this was specific to browser chat.
+- Fix:
+  - added `HERMES_TUI_DIST_DIR=./.hermes-local-llm-hostuid-ui-tui-dist`;
+  - mounted it to `/opt/hermes/ui-tui/dist` in
+    `docker-compose.hermes-local-llm.yml`;
+  - made `init-hostuid` create both the Hermes data directory and the TUI dist
+    directory;
+  - added the TUI dist directory to `.gitignore`.
+- Verification after recreating the container:
+  - direct websocket check against
+    `/api/pty?resume=20260605_111558_c4f41d` returned
+    `101 Switching Protocols`;
+  - websocket payload contained terminal bytes instead of `Chat unavailable`;
+  - `/opt/hermes/ui-tui/dist/entry.js` was created as uid/gid 1000;
+  - `smoke-hostuid` returned `hermes gateway local llm ready` with
+    `prompt_tokens=14608`, `completion_tokens=31`, `total_tokens=14639`.

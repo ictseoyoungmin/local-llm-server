@@ -207,6 +207,11 @@ init_hostuid_runtime() {
   else
     echo "Keeping existing ${HOSTUID_ENV_FILE}"
   fi
+
+  local home_dir tui_dist_dir
+  home_dir="$(env_value HERMES_HOME_DIR "./.hermes-local-llm-hostuid" "${HOSTUID_ENV_FILE}")"
+  tui_dist_dir="$(env_value HERMES_TUI_DIST_DIR "./.hermes-local-llm-hostuid-ui-tui-dist" "${HOSTUID_ENV_FILE}")"
+  mkdir -p "${home_dir}" "${tui_dist_dir}"
 }
 
 command="${1:-}"

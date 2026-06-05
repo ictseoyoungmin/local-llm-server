@@ -10,6 +10,7 @@ services:
     volumes:
       - ${HERMES_HOME_DIR:-./.hermes}:/opt/data
       - ${HERMES_SEED_DIR:-./.hermes-runtime-example}:/opt/local-llm-hermes-runtime:ro
+      - ${HERMES_TUI_DIST_DIR:-./.hermes-local-llm-hostuid-ui-tui-dist}:/opt/hermes/ui-tui/dist
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker:ro
 

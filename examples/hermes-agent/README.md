@@ -104,7 +104,15 @@ Runtime state is stored in:
 
 ```text
 .hermes-local-llm-hostuid/
+.hermes-local-llm-hostuid-ui-tui-dist/
 ```
+
+The first directory is Hermes `/opt/data` state. The second directory is only
+the writable dashboard TUI build output mounted at `/opt/hermes/ui-tui/dist`.
+Keep it host-writable for uid/gid 1000. If it is missing or not writable, the
+API smoke path may still pass, but `http://localhost:49119/chat` can show
+`Chat unavailable: 1` because Hermes cannot rebuild `entry.js` for the embedded
+PTY-backed chat.
 
 Existing `.hermes-local-llm-hostuid/config.yaml` and `SOUL.md` are kept by
 default. To intentionally reseed them from `.hermes-runtime-example/`, set this
