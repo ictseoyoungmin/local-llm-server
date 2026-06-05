@@ -51,6 +51,9 @@ docs/verification/benchmarks/examples/qwen3.5-2b-mtp-q4-xl.sample.jsonl
 Each record should include:
 
 - selected profile and model
+- measurement timestamps: `started_at`, `finished_at`, and runtime `collected_at`
+- llama.cpp runtime metadata: `runtime.llama_server_version`,
+  `runtime.container_image`, and image digest/creation details when Docker is accessible
 - benchmark preset and label
 - health metadata, including `n_ctx`
 - elapsed wall time

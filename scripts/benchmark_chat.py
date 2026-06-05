@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import subprocess
 import time
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -13,6 +14,7 @@ from urllib.request import Request, urlopen
 
 
 DEFAULT_OUTPUT = Path("docs/verification/benchmarks/results/chat-benchmarks.jsonl")
+DEFAULT_LLAMA_CONTAINER = os.getenv("LLAMA_CONTAINER_NAME", "local-llm-server-llama-1")
 
 PROMPT_PRESETS: dict[str, dict[str, Any]] = {
     "short-ready": {
@@ -143,6 +145,69 @@ def append_record(path: Path, record: dict[str, Any]) -> None:
         handle.write("\n")
 
 
+def run_command(command: list[str], timeout: float = 10.0) -> tuple[bool, str]:
+    try:
+        result = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except Exception as exc:
+        return False, str(exc)
+    output = (result.stdout or result.stderr).strip()
+    return result.returncode == 0, output
+
+
+def collect_runtime_info(container_name: str = DEFAULT_LLAMA_CONTAINER) -> dict[str, Any]:
+    runtime: dict[str, Any] = {
+        "collected_at": utc_now(),
+        "container": container_name,
+    }
+
+    ok, output = run_command(["docker", "exec", container_name, "/app/llama-server", "--version"])
+    if ok:
+        runtime["llama_server_version"] = output
+    else:
+        runtime["llama_server_version_error"] = output
+
+    ok, output = run_command(
+        [
+            "docker",
+            "inspect",
+            "--format",
+            "{{.Image}} {{.Config.Image}} {{.Created}}",
+            container_name,
+        ]
+    )
+    if ok:
+        parts = output.split(maxsplit=2)
+        runtime["container_image_id"] = parts[0] if len(parts) > 0 else ""
+        runtime["container_image"] = parts[1] if len(parts) > 1 else ""
+        runtime["container_created_at"] = parts[2] if len(parts) > 2 else ""
+    else:
+        runtime["container_image_error"] = output
+
+    image = runtime.get("container_image")
+    if image:
+        ok, output = run_command(
+            [
+                "docker",
+                "inspect",
+                "--format",
+                "{{.Id}} {{.RepoTags}} {{.RepoDigests}} {{.Created}}",
+                str(image),
+            ]
+        )
+        if ok:
+            runtime["image_inspect"] = output
+        else:
+            runtime["image_inspect_error"] = output
+
+    return runtime
+
+
 def apply_preset(args: argparse.Namespace) -> None:
     preset = PROMPT_PRESETS.get(args.preset, {}) if args.preset != "custom" else {}
     custom_messages = args.system is not None or args.prompt is not None
@@ -182,6 +247,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--timeout", type=float, default=240.0)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--llama-container", default=DEFAULT_LLAMA_CONTAINER)
     return parser
 
 
@@ -209,6 +275,7 @@ def main(argv: list[str] | None = None) -> int:
     messages = build_messages(args)
     record["message_count"] = len(messages)
     record["turn_count"] = sum(1 for message in messages if message.get("role") == "user")
+    record["runtime"] = collect_runtime_info(args.llama_container)
 
     try:
         health = get_json(f"{args.base_url.rstrip('/')}/health", timeout=10)

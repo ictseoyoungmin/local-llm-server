@@ -32,6 +32,14 @@ def timing(record: dict[str, Any], key: str) -> str:
     return str(value)
 
 
+def llama_version(record: dict[str, Any]) -> str:
+    version = (record.get("runtime") or {}).get("llama_server_version")
+    if not version:
+        return "-"
+    first_line = str(version).splitlines()[0]
+    return first_line.replace("version: ", "")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Summarize recorded benchmark JSONL.")
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -46,7 +54,7 @@ def main() -> int:
     rows = records[-args.limit :]
     print(
         f"{'STARTED':25} {'PRESET':16} {'LABEL':18} {'PROFILE':24} {'OK':3} "
-        f"{'CTX':8} {'ELAPSED_MS':10} {'P_TOK/S':8} {'G_TOK/S':8} {'DRAFT':9}"
+        f"{'CTX':8} {'ELAPSED_MS':10} {'P_TOK/S':8} {'G_TOK/S':8} {'LLAMA':16} {'DRAFT':9}"
     )
     for record in rows:
         health = record.get("health") or {}
@@ -66,6 +74,7 @@ def main() -> int:
             f"{str(record.get('elapsed_ms', '-'))[:10]:10} "
             f"{timing(record, 'prompt_per_second')[:8]:8} "
             f"{timing(record, 'predicted_per_second')[:8]:8} "
+            f"{llama_version(record)[:16]:16} "
             f"{draft:9}"
         )
     return 0
