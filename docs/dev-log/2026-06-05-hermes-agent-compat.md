@@ -94,3 +94,15 @@ hermes gateway local llm ready
   - `down-hostuid` stopped and removed the container/network.
 - Smoke usage was `prompt_tokens=14402`, `completion_tokens=29`,
   `total_tokens=14431`.
+
+2026-06-05 19:46-19:48 KST:
+
+- Added `HERMES_OVERWRITE_CONFIG` guard to `docker-compose.hermes-local-llm.yml`.
+- Default `HERMES_OVERWRITE_CONFIG=0` keeps existing `/opt/data/config.yaml`
+  and `/opt/data/SOUL.md` on hostuid startup.
+- If set to `1`, the runtime writes timestamped `.bak` files before reseeding
+  those files from `.hermes-runtime-example/`.
+- Reverified `up-hostuid`, logs, `smoke-hostuid`, and `down-hostuid`.
+- Startup logs confirmed both seed files were kept, and smoke returned
+  `hermes gateway local llm ready` with `prompt_tokens=14402`,
+  `completion_tokens=39`, `total_tokens=14441`.

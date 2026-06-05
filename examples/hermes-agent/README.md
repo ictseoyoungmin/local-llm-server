@@ -105,3 +105,13 @@ Runtime state is stored in:
 ```text
 .hermes-local-llm-hostuid/
 ```
+
+Existing `.hermes-local-llm-hostuid/config.yaml` and `SOUL.md` are kept by
+default. To intentionally reseed them from `.hermes-runtime-example/`, set this
+in `.env.hermes-local-llm-hostuid` before `up-hostuid`:
+
+```env
+HERMES_OVERWRITE_CONFIG=1
+```
+
+The runtime creates timestamped `.bak` files before overwriting.

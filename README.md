@@ -231,6 +231,11 @@ For the host-bind, uid/gid 1000 runtime that bypasses the official wrapper:
 ./scripts/run_hermes_runtime_example.sh down-hostuid
 ```
 
+`up-hostuid` keeps an existing `/opt/data/config.yaml` and `/opt/data/SOUL.md`
+by default. Set `HERMES_OVERWRITE_CONFIG=1` in
+`.env.hermes-local-llm-hostuid` only when you intentionally want to reseed them;
+the runtime writes timestamped `.bak` files before overwriting.
+
 Record environment results in
 [docs/verification/hermes-storage-compatibility.md](docs/verification/hermes-storage-compatibility.md).
 

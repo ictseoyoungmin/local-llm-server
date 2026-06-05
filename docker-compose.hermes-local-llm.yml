@@ -35,6 +35,7 @@ services:
       HERMES_DASHBOARD_HOST: 0.0.0.0
       HERMES_DASHBOARD_PORT: "9119"
       HERMES_DASHBOARD_TUI: "1"
+      HERMES_OVERWRITE_CONFIG: "${HERMES_OVERWRITE_CONFIG:-0}"
 
     group_add:
       - "${DOCKER_GID:-1001}"
@@ -48,10 +49,30 @@ services:
     command:
       - |
         set -euo pipefail
-        cp /opt/local-llm-hermes-runtime/config.yaml /opt/data/config.yaml
-        if [[ -f /opt/local-llm-hermes-runtime/SOUL.md ]]; then
-          cp /opt/local-llm-hermes-runtime/SOUL.md /opt/data/SOUL.md
-        fi
+
+        seed_file() {
+          local source_file="$1"
+          local target_file="$2"
+          if [[ ! -f "$$source_file" ]]; then
+            return
+          fi
+          if [[ ! -f "$$target_file" ]]; then
+            cp "$$source_file" "$$target_file"
+            echo "Seeded $${target_file}"
+            return
+          fi
+          if [[ "$${HERMES_OVERWRITE_CONFIG:-0}" =~ ^(1|true|TRUE|True|yes|YES|Yes)$$ ]]; then
+            backup_file="$${target_file}.bak.$$(date -u +%Y%m%d_%H%M%S)"
+            cp "$$target_file" "$$backup_file"
+            cp "$$source_file" "$$target_file"
+            echo "Overwrote $${target_file}; backup saved to $${backup_file}"
+            return
+          fi
+          echo "Keeping existing $${target_file}; set HERMES_OVERWRITE_CONFIG=1 to reseed"
+        }
+
+        seed_file /opt/local-llm-hermes-runtime/config.yaml /opt/data/config.yaml
+        seed_file /opt/local-llm-hermes-runtime/SOUL.md /opt/data/SOUL.md
         mkdir -p /opt/data/{cron,sessions,logs,hooks,memories,skills,skins,plans,workspace,home}
         if [[ "$${HERMES_DASHBOARD:-}" =~ ^(1|true|TRUE|True|yes|YES|Yes)$$ ]]; then
           dash_host="$${HERMES_DASHBOARD_HOST:-0.0.0.0}"

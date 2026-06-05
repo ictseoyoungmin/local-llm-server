@@ -123,6 +123,11 @@ wrapper and passed a full gateway smoke as `user: 1000:1000`. Use:
 ./scripts/run_hermes_runtime_example.sh down-hostuid
 ```
 
+The hostuid runtime keeps existing `/opt/data/config.yaml` and `/opt/data/SOUL.md`
+unless `HERMES_OVERWRITE_CONFIG=1` is set. When overwrite is enabled, it creates
+timestamped `.bak` files in the same data directory before copying the seed
+files.
+
 Environment-specific storage results are tracked in
 `docs/verification/hermes-storage-compatibility.md`. Add new filesystem results
 there instead of relying on assumptions from one host.
