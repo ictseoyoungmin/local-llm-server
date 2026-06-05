@@ -111,9 +111,10 @@ and `home/`.
 The external `F:\NowWorking\hermes-agent` runtime uses a different host-bind
 strategy: it mounts `.hermes` as `/opt/data` and sets `HERMES_UID=1000` and
 `HERMES_GID=1000`, matching the WSL host owner. On this host, that uid/gid
-alignment passes basic file and SQLite probes, but the current official Hermes
-image still failed the full gateway smoke in this repository because the
-wrapper stalled while changing ownership of `/opt/hermes/.venv`.
+alignment passes basic file and SQLite probes. The wrapper-based host-uid test
+still failed because the wrapper stalled while changing ownership of
+`/opt/hermes/.venv`, but `docker-compose.hermes-local-llm.yml` bypasses that
+wrapper and passed a full gateway smoke as `user: 1000:1000`.
 
 Environment-specific storage results are tracked in
 `docs/verification/hermes-storage-compatibility.md`. Add new filesystem results

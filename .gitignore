@@ -12,8 +12,10 @@ hermes-agent-smoke/*
 !hermes-agent-smoke/config.yaml
 .env.hermes-runtime
 .env.hermes-runtime.backup.*
+.env.hermes-local-llm-hostuid
 .hermes-runtime-example/
 .hermes/
+.hermes-local-llm-hostuid/
 .env.hermes-bind-test
 .env.hermes-bind-host-uid
 .hermes-runtime-bind-test/

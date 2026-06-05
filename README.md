@@ -222,6 +222,15 @@ whether a host filesystem is safe for `/opt/data`, run:
 ./scripts/verify_host_storage_primitives.sh
 ```
 
+For the host-bind, uid/gid 1000 runtime that bypasses the official wrapper:
+
+```bash
+cp examples/hermes-agent/hermes-local-llm.hostuid.env.example .env.hermes-local-llm-hostuid
+docker compose -f docker-compose.hermes-local-llm.yml --env-file .env.hermes-local-llm-hostuid up -d
+HERMES_CONTAINER=local-llm-hermes-local-hostuid ./scripts/smoke_hermes_runtime.sh
+docker compose -f docker-compose.hermes-local-llm.yml --env-file .env.hermes-local-llm-hostuid down
+```
+
 Record environment results in
 [docs/verification/hermes-storage-compatibility.md](docs/verification/hermes-storage-compatibility.md).
 
