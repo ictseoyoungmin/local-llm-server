@@ -236,6 +236,19 @@ by default. Set `HERMES_OVERWRITE_CONFIG=1` in
 `.env.hermes-local-llm-hostuid` only when you intentionally want to reseed them;
 the runtime writes timestamped `.bak` files before overwriting.
 
+The hostuid runtime also bootstraps non-secret local defaults into
+`/opt/data/.env` when they are missing:
+
+```env
+API_SERVER_KEY=change-me-local-hermes-key
+OPENAI_BASE_URL=http://host.docker.internal:18080/v1
+OPENAI_API_KEY=local-not-required
+GATEWAY_ALLOW_ALL_USERS=true
+```
+
+`OPENAI_API_KEY=local-not-required` is a local placeholder for Hermes' custom
+OpenAI-compatible provider path, not a real external OpenAI credential.
+
 Record environment results in
 [docs/verification/hermes-storage-compatibility.md](docs/verification/hermes-storage-compatibility.md).
 

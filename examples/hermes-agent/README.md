@@ -115,3 +115,16 @@ HERMES_OVERWRITE_CONFIG=1
 ```
 
 The runtime creates timestamped `.bak` files before overwriting.
+
+The hostuid startup also creates or updates `/opt/data/.env` with local
+non-secret defaults when keys are missing:
+
+```env
+API_SERVER_KEY=change-me-local-hermes-key
+OPENAI_BASE_URL=http://host.docker.internal:18080/v1
+OPENAI_API_KEY=local-not-required
+GATEWAY_ALLOW_ALL_USERS=true
+```
+
+This satisfies Hermes doctor for the local custom endpoint path while keeping
+external provider keys unset.

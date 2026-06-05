@@ -138,3 +138,25 @@ hermes gateway local llm ready
 - Conclusion: the fresh hostuid runtime and host-published API/dashboard ports
   are healthy. The earlier connection-refused result was caused by the Codex
   command sandbox.
+
+2026-06-05 20:39-20:41 KST:
+
+- Addressed actionable `hermes doctor` issues for hostuid mode:
+  - startup creates `/opt/data/.env` when missing;
+  - startup creates `~/.local/bin/hermes` symlink for the container `HOME`;
+  - startup appends missing local provider defaults to existing `/opt/data/.env`.
+- Added local non-secret defaults:
+  - `API_SERVER_KEY=change-me-local-hermes-key`;
+  - `OPENAI_BASE_URL=http://host.docker.internal:18080/v1`;
+  - `OPENAI_API_KEY=local-not-required`;
+  - `GATEWAY_ALLOW_ALL_USERS=true`.
+- Re-ran `hermes doctor`. Fixed items:
+  - `/opt/data/.env file exists`;
+  - `API key or custom endpoint configured`;
+  - `~/.local/bin/hermes -> correct target`.
+- Remaining doctor issue is expected for a local-only setup:
+  `Run 'hermes setup' to configure missing API keys for full tool access`.
+  This refers to optional external tool/provider keys such as OpenRouter,
+  Discord, web search, and similar integrations.
+- Re-ran `smoke-hostuid`; it returned `hermes gateway local llm ready` with
+  `prompt_tokens=14608`, `completion_tokens=33`, `total_tokens=14641`.
