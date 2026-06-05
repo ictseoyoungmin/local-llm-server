@@ -7,7 +7,8 @@ services:
     restart: unless-stopped
 
     volumes:
-      - ${HERMES_HOME_DIR:-./.hermes-runtime-example}:/opt/data
+      - hermes-data:/opt/data
+      - ${HERMES_SEED_DIR:-./.hermes-runtime-example}:/opt/local-llm-hermes-runtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker:ro
 
@@ -43,4 +44,18 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-    command: ["gateway", "run"]
+    entrypoint:
+      - /bin/bash
+      - -lc
+    command:
+      - |
+        set -euo pipefail
+        cp /opt/local-llm-hermes-runtime/config.yaml /opt/data/config.yaml
+        if [[ -f /opt/local-llm-hermes-runtime/SOUL.md ]]; then
+          cp /opt/local-llm-hermes-runtime/SOUL.md /opt/data/SOUL.md
+        fi
+        exec /opt/hermes/docker/entrypoint.sh gateway run
+
+volumes:
+  hermes-data:
+    name: ${HERMES_DATA_VOLUME:-local-llm-hermes-data}

@@ -47,6 +47,12 @@ That creates gitignored local files:
 .hermes-runtime-example/SOUL.md
 ```
 
+The example runtime stores mutable Hermes state in the Docker named volume
+`local-llm-hermes-data`. The `.hermes-runtime-example/` directory is only a
+read-only seed mounted into the container and copied into `/opt/data` at
+startup. This avoids WSL/DrvFS bind-mount write permission failures for the
+container's `hermes` user.
+
 The runtime also mounts Docker access for Hermes terminal tooling:
 
 ```text
@@ -95,6 +101,12 @@ the Windows/WSL bind-mounted Hermes data directory. Preserve it in gateway mode.
 `HERMES_UID/HERMES_GID=10000` matches the official image's built-in `hermes`
 user. Overriding those values can trigger a slow recursive ownership change of
 the image's internal virtual environment before the API server starts.
+
+For the repository-local example runtime, do not bind-mount the whole Hermes
+home directory from WSL/DrvFS as `/opt/data`. Host-created directories are often
+owned by uid 1000 while the container writes as uid 10000, which can produce
+`Permission denied` for directories such as `skins/`, `plans/`, `workspace/`,
+and `home/`.
 
 The one-shot smoke container in this repository bypasses the wrapper entrypoint
 only to avoid repeated ownership changes during short CLI tests. Do not use that

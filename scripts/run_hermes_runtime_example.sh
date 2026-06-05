@@ -3,7 +3,7 @@ set -euo pipefail
 
 COMPOSE_FILE="${HERMES_RUNTIME_COMPOSE_FILE:-docker-compose.hermes-runtime.example.yml}"
 ENV_FILE="${HERMES_RUNTIME_ENV_FILE:-.env.hermes-runtime}"
-DATA_DIR="${HERMES_HOME_DIR:-./.hermes-runtime-example}"
+SEED_DIR="${HERMES_SEED_DIR:-./.hermes-runtime-example}"
 CONFIG_TEMPLATE="${HERMES_RUNTIME_CONFIG_TEMPLATE:-examples/hermes-agent/config.local-llm.yaml}"
 ENV_TEMPLATE="${HERMES_RUNTIME_ENV_TEMPLATE:-examples/hermes-agent/hermes-runtime.env.example}"
 
@@ -18,12 +18,13 @@ Usage:
   ./scripts/run_hermes_runtime_example.sh logs
 
 This manages the example full Hermes-agent gateway runtime in this repository.
-It writes runtime state under ./.hermes-runtime-example, which is gitignored.
+It stores Hermes runtime state in a Docker named volume. The gitignored
+./.hermes-runtime-example directory is only a seed/config source.
 EOF
 }
 
 init_runtime() {
-  mkdir -p "${DATA_DIR}"
+  mkdir -p "${SEED_DIR}"
 
   if [[ ! -f "${ENV_FILE}" ]]; then
     cp "${ENV_TEMPLATE}" "${ENV_FILE}"
@@ -32,16 +33,16 @@ init_runtime() {
     migrate_env_defaults
   fi
 
-  if [[ ! -f "${DATA_DIR}/config.yaml" ]]; then
-    cp "${CONFIG_TEMPLATE}" "${DATA_DIR}/config.yaml"
-    echo "Created ${DATA_DIR}/config.yaml"
+  if [[ ! -f "${SEED_DIR}/config.yaml" ]]; then
+    cp "${CONFIG_TEMPLATE}" "${SEED_DIR}/config.yaml"
+    echo "Created ${SEED_DIR}/config.yaml"
   else
-    echo "Keeping existing ${DATA_DIR}/config.yaml"
+    echo "Keeping existing ${SEED_DIR}/config.yaml"
   fi
 
-  if [[ ! -f "${DATA_DIR}/SOUL.md" ]]; then
-    printf '%s\n' '# Hermes Local Runtime' '' 'Use the configured local LLM gateway for this runtime.' > "${DATA_DIR}/SOUL.md"
-    echo "Created ${DATA_DIR}/SOUL.md"
+  if [[ ! -f "${SEED_DIR}/SOUL.md" ]]; then
+    printf '%s\n' '# Hermes Local Runtime' '' 'Use the configured local LLM gateway for this runtime.' > "${SEED_DIR}/SOUL.md"
+    echo "Created ${SEED_DIR}/SOUL.md"
   fi
 }
 
@@ -51,6 +52,7 @@ migrate_env_defaults() {
   awk '
     /^HERMES_UID=1000$/ { print "HERMES_UID=10000"; changed=1; next }
     /^HERMES_GID=1000$/ { print "HERMES_GID=10000"; changed=1; next }
+    /^HERMES_HOME_DIR=/ { print "HERMES_SEED_DIR=./.hermes-runtime-example"; print "HERMES_DATA_VOLUME=local-llm-hermes-data"; changed=1; next }
     { print }
     END { if (changed) exit 42 }
   ' "${ENV_FILE}" > "${tmp_file}" || {

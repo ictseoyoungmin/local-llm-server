@@ -48,6 +48,7 @@ echo "Sending request through Hermes API server inside the container"
 docker exec -i \
   -e HERMES_RUNTIME_SMOKE_MODEL="${MODEL}" \
   -e HERMES_RUNTIME_SMOKE_PROMPT="${PROMPT}" \
+  -e API_SERVER_KEY="${API_SERVER_KEY:-}" \
   "${HERMES_CONTAINER}" \
   /opt/hermes/.venv/bin/python3 - <<'PY'
 import json
@@ -58,12 +59,15 @@ import urllib.request
 
 
 def _container_env() -> dict[str, str]:
-    raw = open("/proc/1/environ", "rb").read().decode("utf-8", errors="ignore")
+    try:
+        raw = open("/proc/1/environ", "rb").read().decode("utf-8", errors="ignore")
+    except PermissionError:
+        return {}
     pairs = (item.split("=", 1) for item in raw.split("\0") if "=" in item)
     return {key: value for key, value in pairs}
 
 
-key = _container_env().get("API_SERVER_KEY", "")
+key = os.environ.get("API_SERVER_KEY") or _container_env().get("API_SERVER_KEY", "")
 if not key:
     raise SystemExit("API_SERVER_KEY is not available in the Hermes container environment")
 

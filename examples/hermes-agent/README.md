@@ -34,6 +34,12 @@ This creates gitignored files:
 .hermes-runtime-example/SOUL.md
 ```
 
+Hermes runtime state is stored in the Docker named volume
+`local-llm-hermes-data`. The `.hermes-runtime-example/` directory is only a
+seed/config source copied into `/opt/data` at container startup. This avoids
+WSL/DrvFS bind-mount write permission issues for the container's `hermes`
+user.
+
 The compose project name defaults to `local-llm-hermes-runtime`, so it stays
 separate from this repository's main `llama` and `gateway` compose stack.
 
@@ -56,6 +62,9 @@ The example defaults `HERMES_UID/HERMES_GID` to `10000`, matching the official
 image's built-in `hermes` user. Setting these to a different user can make the
 entrypoint spend a long time recursively changing ownership of
 `/opt/hermes/.venv` before the API server starts.
+
+Edit `.hermes-runtime-example/config.yaml` to change the local provider seed.
+The file is copied into the named volume whenever the container starts.
 
 If `up` already failed with `port is already allocated`, clean the failed
 container before retrying:
