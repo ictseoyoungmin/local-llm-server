@@ -13,3 +13,6 @@ hermes-agent-smoke/*
 .env.hermes-runtime
 .env.hermes-runtime.backup.*
 .hermes-runtime-example/
+.env.hermes-bind-test
+.hermes-runtime-bind-test/
+.hermes-storage-probe/

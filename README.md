@@ -213,6 +213,17 @@ This repository also includes a full Hermes gateway example:
 ./scripts/run_hermes_runtime_example.sh smoke
 ```
 
+Hermes mutable state is stored in a Docker named volume by default. To test
+whether a host filesystem is safe for `/opt/data`, run:
+
+```bash
+./scripts/verify_hermes_bind_data.sh run
+./scripts/verify_host_storage_primitives.sh
+```
+
+Record environment results in
+[docs/verification/hermes-storage-compatibility.md](docs/verification/hermes-storage-compatibility.md).
+
 Recommended provider environment variables:
 
 ```env

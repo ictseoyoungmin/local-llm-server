@@ -1,0 +1,22 @@
+services:
+  hermes:
+    container_name: ${HERMES_CONTAINER_NAME:-local-llm-hermes-bind-test}
+    volumes:
+      - ${HERMES_BIND_DATA_DIR:-./.hermes-runtime-bind-test}:/opt/data
+      - ${HERMES_SEED_DIR:-./.hermes-runtime-example}:/opt/local-llm-hermes-runtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker:ro
+    ports:
+      - "127.0.0.1:${HERMES_API_PORT:-28642}:8642"
+      - "127.0.0.1:${HERMES_DASHBOARD_PORT:-29119}:9119"
+    env_file:
+      - ${HERMES_BIND_ENV_FILE:-.env.hermes-bind-test}
+    environment:
+      HERMES_COMPOSE_PROJECT_NAME: ${HERMES_COMPOSE_PROJECT_NAME:-local-llm-hermes-bind-test}
+      HERMES_CONTAINER_NAME: ${HERMES_CONTAINER_NAME:-local-llm-hermes-bind-test}
+      HERMES_SEED_DIR: ${HERMES_SEED_DIR:-./.hermes-runtime-example}
+      HERMES_DATA_VOLUME: ${HERMES_DATA_VOLUME:-local-llm-hermes-bind-test-unused}
+      HERMES_API_PORT: ${HERMES_API_PORT:-28642}
+      HERMES_DASHBOARD_PORT: ${HERMES_DASHBOARD_PORT:-29119}
+
+volumes: {}

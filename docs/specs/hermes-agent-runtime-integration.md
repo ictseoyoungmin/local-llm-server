@@ -108,6 +108,10 @@ owned by uid 1000 while the container writes as uid 10000, which can produce
 `Permission denied` for directories such as `skins/`, `plans/`, `workspace/`,
 and `home/`.
 
+Environment-specific storage results are tracked in
+`docs/verification/hermes-storage-compatibility.md`. Add new filesystem results
+there instead of relying on assumptions from one host.
+
 The one-shot smoke container in this repository bypasses the wrapper entrypoint
 only to avoid repeated ownership changes during short CLI tests. Do not use that
 shortcut for the long-running Hermes gateway.

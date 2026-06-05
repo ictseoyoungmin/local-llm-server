@@ -58,4 +58,6 @@ Use these docs first:
   compatibility matrix.
 - `verification/hermes-agent-compatibility.md`: observed Hermes-agent
   container connection results.
+- `verification/hermes-storage-compatibility.md`: environment matrix for Hermes
+  `/opt/data` storage backends.
 - `verification/benchmarks/`: benchmark records and comparison notes.
