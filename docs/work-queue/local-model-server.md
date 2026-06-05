@@ -18,6 +18,14 @@
   llama.cpp rejects.
 - [x] Run the official Hermes-agent Docker smoke container against the rebuilt
   gateway and record the result.
+- [x] Fix and record hostuid dashboard `/chat` failure where API smoke passed
+  but `/api/pty` returned `Chat unavailable: 1`. Resolution: mount a writable
+  `HERMES_TUI_DIST_DIR` to `/opt/hermes/ui-tui/dist`.
+- [x] Fix and record hostuid browser tool launch failure where
+  `browser_navigate` reported `Failed to launch Chrome at ""`. Resolution:
+  preserve the compose `PATH` with `/bin/bash -c` and set
+  `AGENT_BROWSER_EXECUTABLE_PATH` to the Hermes image's bundled Chromium
+  headless shell.
 
 ## Next
 
@@ -32,6 +40,8 @@
   quality fallback; default remains non-MTP Q4 XL based on current benchmarks.
 - [ ] Run an end-to-end Hermes tool workflow and record whether llama.cpp
   honors tool schemas for the selected profile/runtime.
+- [ ] Add a combined Hermes tool smoke that exercises browser navigation,
+  terminal execution, and one local LLM follow-up in the same chat session.
 - [x] Apply the local model config to the full
   `/mnt/f/NowWorking/hermes-agent` gateway runtime, excluding secrets, and
   record gateway `/v1/health` plus API request behavior.

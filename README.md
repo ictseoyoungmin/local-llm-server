@@ -228,6 +228,7 @@ For the host-bind, uid/gid 1000 runtime that bypasses the official wrapper:
 ./scripts/run_hermes_runtime_example.sh init-hostuid
 ./scripts/run_hermes_runtime_example.sh up-hostuid
 ./scripts/run_hermes_runtime_example.sh smoke-hostuid
+./scripts/smoke_hermes_browser_tool.sh
 ./scripts/run_hermes_runtime_example.sh down-hostuid
 ```
 
@@ -259,6 +260,20 @@ Hermes dashboard `/chat` starts an embedded PTY-backed TUI. Without this
 separate writable mount, the API smoke path can pass while the browser chat tab
 shows `Chat unavailable: 1` because the container user cannot rebuild
 `/opt/hermes/ui-tui/dist/entry.js` inside the image filesystem.
+
+The hostuid browser tool path also needs a real Chrome executable and the
+Hermes Node tool path:
+
+```env
+AGENT_BROWSER_EXECUTABLE_PATH=/opt/hermes/.playwright/chromium_headless_shell-1217/chrome-headless-shell-linux64/chrome-headless-shell
+PLAYWRIGHT_BROWSERS_PATH=/opt/hermes/.playwright
+PATH=/opt/hermes/.venv/bin:/opt/hermes/node_modules/.bin:/opt/data/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+```
+
+`docker-compose.hermes-local-llm.yml` uses `/bin/bash -c`, not a login shell,
+so this `PATH` is preserved. If browser tools report that Chrome cannot be
+launched from `""`, check that `AGENT_BROWSER_EXECUTABLE_PATH` is not blank and
+then run `./scripts/smoke_hermes_browser_tool.sh`.
 
 Record environment results in
 [docs/verification/hermes-storage-compatibility.md](docs/verification/hermes-storage-compatibility.md).

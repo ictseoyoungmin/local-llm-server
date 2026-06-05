@@ -97,6 +97,7 @@ step.
 ./scripts/run_hermes_runtime_example.sh init-hostuid
 ./scripts/run_hermes_runtime_example.sh up-hostuid
 ./scripts/run_hermes_runtime_example.sh smoke-hostuid
+./scripts/smoke_hermes_browser_tool.sh
 ./scripts/run_hermes_runtime_example.sh down-hostuid
 ```
 
@@ -136,3 +137,16 @@ GATEWAY_ALLOW_ALL_USERS=true
 
 This satisfies Hermes doctor for the local custom endpoint path while keeping
 external provider keys unset.
+
+For browser tools, the hostuid compose file points agent-browser at the
+Chromium headless shell bundled in the Hermes image:
+
+```env
+AGENT_BROWSER_EXECUTABLE_PATH=/opt/hermes/.playwright/chromium_headless_shell-1217/chrome-headless-shell-linux64/chrome-headless-shell
+PLAYWRIGHT_BROWSERS_PATH=/opt/hermes/.playwright
+```
+
+The compose entrypoint uses `/bin/bash -c` so the configured `PATH` keeps
+`/opt/hermes/node_modules/.bin` visible. If `browser_navigate` fails with
+`Failed to launch Chrome at ""`, recreate the container from this compose file
+and run `./scripts/smoke_hermes_browser_tool.sh`.

@@ -85,6 +85,8 @@ HERMES_HOME=/opt/data
 HERMES_UID=10000
 HERMES_GID=10000
 HOME=/tmp/hermes-browser
+AGENT_BROWSER_EXECUTABLE_PATH=/opt/hermes/.playwright/chromium_headless_shell-1217/chrome-headless-shell-linux64/chrome-headless-shell
+PLAYWRIGHT_BROWSERS_PATH=/opt/hermes/.playwright
 PATH=/opt/hermes/.venv/bin:/opt/hermes/node_modules/.bin:/opt/data/.local/bin:...
 API_SERVER_ENABLED=true
 API_SERVER_HOST=0.0.0.0
@@ -97,6 +99,10 @@ HERMES_DASHBOARD_TUI=1
 
 `HOME=/tmp/hermes-browser` keeps browser daemon sockets and transient state off
 the Windows/WSL bind-mounted Hermes data directory. Preserve it in gateway mode.
+`AGENT_BROWSER_EXECUTABLE_PATH` must point at a real executable. Do not set it
+to an empty value: Hermes browser tools pass it through to agent-browser, and an
+empty value can produce `Failed to launch Chrome at ""` even when the image
+already contains a usable Chromium build.
 
 `HERMES_UID/HERMES_GID=10000` matches the official image's built-in `hermes`
 user. Overriding those values can trigger a slow recursive ownership change of
@@ -127,6 +133,17 @@ The hostuid runtime keeps existing `/opt/data/config.yaml` and `/opt/data/SOUL.m
 unless `HERMES_OVERWRITE_CONFIG=1` is set. When overwrite is enabled, it creates
 timestamped `.bak` files in the same data directory before copying the seed
 files.
+
+Hostuid dashboard `/chat` and browser tools have separate writable/executable
+requirements from the provider API:
+
+- `/chat` uses `/api/pty` and rebuilds the embedded TUI bundle, so
+  `HERMES_TUI_DIST_DIR` must be mounted to `/opt/hermes/ui-tui/dist`.
+- `browser_navigate` uses agent-browser and Chromium, so
+  `AGENT_BROWSER_EXECUTABLE_PATH` should default to the bundled Chromium
+  headless shell in `/opt/hermes/.playwright`.
+- The compose entrypoint should use `/bin/bash -c`, not `/bin/bash -lc`; a
+  login shell can reset `PATH` and hide `/opt/hermes/node_modules/.bin`.
 
 Environment-specific storage results are tracked in
 `docs/verification/hermes-storage-compatibility.md`. Add new filesystem results

@@ -191,3 +191,34 @@ hermes gateway local llm ready
   - `/opt/hermes/ui-tui/dist/entry.js` was created as uid/gid 1000;
   - `smoke-hostuid` returned `hermes gateway local llm ready` with
     `prompt_tokens=14608`, `completion_tokens=31`, `total_tokens=14639`.
+
+## 23:19-23:35 KST - Fix Hostuid Browser Tool Launch
+
+- Symptom: dashboard chat could call `browser_navigate`, but the tool could not
+  open external pages. The UI looked like an internet problem.
+- Network check:
+  - `getent hosts search.google.com` resolved addresses inside the container;
+  - `curl -I -L --max-time 10 https://search.google.com/search?...` reached
+    Google and returned HTTP, so Docker DNS/egress was not the primary failure.
+- Actual failure from Hermes logs:
+  - `browser_navigate` returned
+    `Failed to launch Chrome at "": No such file or directory`.
+- Root causes:
+  - `.env.hermes-local-llm-hostuid` had `AGENT_BROWSER_EXECUTABLE_PATH=` as an
+    explicit empty value;
+  - `docker-compose.hermes-local-llm.yml` used `/bin/bash -lc`, so the login
+    shell reset `PATH` and hid `/opt/hermes/node_modules/.bin` from process
+    env.
+- Fix:
+  - set `AGENT_BROWSER_EXECUTABLE_PATH` to the bundled executable:
+    `/opt/hermes/.playwright/chromium_headless_shell-1217/chrome-headless-shell-linux64/chrome-headless-shell`;
+  - set `PLAYWRIGHT_BROWSERS_PATH=/opt/hermes/.playwright`;
+  - changed the compose entrypoint from `/bin/bash -lc` to `/bin/bash -c`;
+  - added `scripts/smoke_hermes_browser_tool.sh`.
+- Verification after recreating the container:
+  - process env preserved
+    `/opt/hermes/.venv/bin:/opt/hermes/node_modules/.bin:...`;
+  - `./scripts/smoke_hermes_browser_tool.sh` returned
+    `{"success": true, "error": null, "url": "https://example.com"}`;
+  - `smoke-hostuid` still returned `hermes gateway local llm ready` with
+    `prompt_tokens=14608`, `completion_tokens=31`, `total_tokens=14639`.
