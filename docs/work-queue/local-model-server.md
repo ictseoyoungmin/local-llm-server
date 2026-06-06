@@ -47,6 +47,12 @@
   record gateway `/v1/health` plus API request behavior.
 - [ ] Diagnose why host access to Hermes `127.0.0.1:8642` is intermittent
   while container-internal API access works.
+- [ ] Retest 4B-class non-QAT profiles only when the machine is otherwise idle.
+  The first attempt caused severe desktop slowdown while other containers and
+  processes were active, so the next pass should isolate one model at a time.
+- [ ] Retest `gemma4-e4b-it-qat-q4-xl` with smaller context sizes such as
+  `32768` and `65536`. It loads at `130000`, but Hermes-routing timed out after
+  420 seconds in the first recorded run.
 
 ## Later
 
