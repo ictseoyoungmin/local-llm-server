@@ -53,6 +53,9 @@
 - [ ] Retest `gemma4-e4b-it-qat-q4-xl` with smaller context sizes such as
   `32768` and `65536`. It loads at `130000`, but Hermes-routing timed out after
   420 seconds in the first recorded run.
+- [ ] Retest `gemma4-e4b-it-qat-q2-xl` at `32768` and `65536`. It completes
+  Hermes-routing at `130000`, unlike Q4, but still took about 87 seconds and
+  used roughly 5.4 GiB VRAM in the recorded run.
 
 ## Later
 
