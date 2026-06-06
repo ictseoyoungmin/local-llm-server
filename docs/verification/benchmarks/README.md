@@ -21,6 +21,15 @@ Use a Hermes-like planning prompt:
   --timeout 300
 ```
 
+For full local-agent capability testing, use:
+
+```text
+docs/verification/benchmarks/agent-capability-protocol.md
+```
+
+The protocol covers speed, Hermes tool routing, loop resistance, goal
+completion, answer quality, and wiki/memory quality.
+
 Available presets:
 
 - `short-ready`: smoke test, not useful as a throughput benchmark.
