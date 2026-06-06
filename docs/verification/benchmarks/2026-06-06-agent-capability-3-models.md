@@ -70,13 +70,50 @@ These are preliminary scores from the quantitative chat benchmarks only. Tool
 use, loop resistance, and wiki/memory quality require Hermes-agent tool runs and
 must remain pending until those tests are executed.
 
+After the Hermes API compatibility smoke below, stability and operational fit
+should be interpreted more strictly:
+
+- `qwen3.5-2b-q4-xl`: remains the safest default candidate.
+- `gemma4-e2b-q4`: compatible but slower through the full Hermes API prompt.
+- `gemma4-e4b-it-qat-q2-xl`: not suitable as a default at `130000` because the
+  Hermes API smoke timed out.
+
+## Hermes API Compatibility Smoke
+
+This smoke uses `./scripts/run_hermes_runtime_example.sh smoke-hostuid`. It sends
+a minimal OpenAI-compatible request through the Hermes API server, not directly
+to the local gateway. The observed prompt size is about `14.7k-15.1k` tokens
+because Hermes adds its runtime/system context.
+
+| Profile | Model | Result | Prompt tokens | Completion tokens | Notes |
+| --- | --- | --- | ---: | ---: | --- |
+| `qwen3.5-2b-q4-xl` | `qwen3.5-2b-ud-q4-k-xl` | success | `15084` | `41` | returned `hermes gateway local llm ready` |
+| `gemma4-e2b-q4` | `gemma-4-E2B-it-Q4_K_M` | success | `14723` | `105` | returned `hermes gateway local llm ready`; much slower than Qwen |
+| `gemma4-e4b-it-qat-q2-xl` | `gemma-4-E4B-it-qat-UD-Q2_K_XL` | timeout | n/a | n/a | llama.cpp logs showed `14719` prompt tokens processed after about `219s`, but the Hermes smoke request timed out before a response |
+
+Direct browser runtime smoke was also checked once with:
+
+```bash
+./scripts/smoke_hermes_browser_tool.sh
+```
+
+Result:
+
+```json
+{"success": true, "error": null, "url": "https://example.com", "task_id": "local-llm-browser-smoke"}
+```
+
+This confirms the Hermes browser tool runtime is available. It does not yet
+prove model-directed tool routing quality, because the browser tool was invoked
+directly by the smoke script rather than selected by the model in a chat.
+
 ## Tool Routing Notes
 
 | Profile | Tools called | Repeated calls? | Useful citation? | Final answer usable? | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `qwen3.5-2b-q4-xl` | pending | pending | pending | pending |  |
-| `gemma4-e2b-q4` | pending | pending | pending | pending |  |
-| `gemma4-e4b-it-qat-q2-xl` | pending | pending | pending | pending |  |
+| `qwen3.5-2b-q4-xl` | browser runtime smoke only | no | n/a | n/a | Hermes API smoke passed; model-directed tool routing still pending |
+| `gemma4-e2b-q4` | not run | n/a | n/a | n/a | Hermes API smoke passed; model-directed tool routing still pending |
+| `gemma4-e4b-it-qat-q2-xl` | not run | n/a | n/a | n/a | Hermes API smoke timed out before tool routing test |
 
 ## Wiki / File Work Notes
 
@@ -88,6 +125,13 @@ must remain pending until those tests are executed.
 
 ## Decision
 
-Pending. The default model should be chosen by operational fit, not just answer
-quality. A slower model can remain a specialist candidate for wiki-building or
-deep summarization if it scores well on quality and loop resistance.
+Interim decision after quantitative benchmarks and Hermes API smoke:
+
+- Default candidate: `qwen3.5-2b-q4-xl`
+- Secondary practical candidate: `gemma4-e2b-q4`
+- Specialist/experimental only: `gemma4-e4b-it-qat-q2-xl`
+
+The default model should be chosen by operational fit, not just answer quality.
+A slower model can remain a specialist candidate for wiki-building or deep
+summarization if it scores well on quality and loop resistance, but QAT Q2 must
+first pass the Hermes API smoke at a smaller context.
