@@ -56,6 +56,9 @@
 - [ ] Retest `gemma4-e4b-it-qat-q2-xl` at `32768` and `65536`. It completes
   Hermes-routing at `130000`, unlike Q4, but still took about 87 seconds and
   used roughly 5.4 GiB VRAM in the recorded run.
+- [ ] Recheck Qwen3.6 2B availability later. On 2026-06-06, no native
+  Qwen3.6 2B Q4 GGUF was found; Unsloth had 27B/35B GGUFs, and the only 2B-class
+  related candidate was a Qwen3.5 2B distilled repo with f16/q8 files only.
 
 ## Later
 
