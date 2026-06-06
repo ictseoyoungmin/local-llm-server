@@ -62,13 +62,13 @@ Score each item from `0` to `5`.
 
 | Profile | Speed | Stability | Instruction following | Tool use | Loop resistance | Goal completion | Answer quality | Wiki/memory quality | Operational fit | Weighted result |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `qwen3.5-2b-q4-xl` | `5` | `5` | `4` | pending | pending | `4` | `3` | pending | `5` | pending |
-| `gemma4-e2b-q4` | `4` | `4` | `4` | pending | pending | `4` | `3` | pending | `4` | pending |
-| `gemma4-e4b-it-qat-q2-xl` | `2` | `3` | `3` | pending | pending | `3` | `3` | pending | `2` | pending |
+| `qwen3.5-2b-q4-xl` | `5` | `5` | `3` | `2` | `2` | `3` | `2` | `1` | `5` | `3.3 / 5` |
+| `gemma4-e2b-q4` | `4` | `4` | `3` | `1` | `3` | `3` | `2` | `2` | `4` | `2.9 / 5` |
+| `gemma4-e4b-it-qat-q2-xl` | `2` | `1` | `3` | `0` | `0` | `1` | `3` | `0` | `1` | `0.8 / 5` |
 
-These are preliminary scores from the quantitative chat benchmarks only. Tool
-use, loop resistance, and wiki/memory quality require Hermes-agent tool runs and
-must remain pending until those tests are executed.
+Weighted result uses the protocol weights for default Hermes-agent selection:
+speed `20%`, stability `20%`, tool use `20%`, goal completion `20%`, loop
+resistance `10%`, and wiki/memory quality `10%`.
 
 After the Hermes API compatibility smoke below, stability and operational fit
 should be interpreted more strictly:
@@ -111,27 +111,79 @@ directly by the smoke script rather than selected by the model in a chat.
 
 | Profile | Tools called | Repeated calls? | Useful citation? | Final answer usable? | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `qwen3.5-2b-q4-xl` | browser runtime smoke only | no | n/a | n/a | Hermes API smoke passed; model-directed tool routing still pending |
-| `gemma4-e2b-q4` | not run | n/a | n/a | n/a | Hermes API smoke passed; model-directed tool routing still pending |
-| `gemma4-e4b-it-qat-q2-xl` | not run | n/a | n/a | n/a | Hermes API smoke timed out before tool routing test |
+| `qwen3.5-2b-q4-xl` | `browser_navigate` x2 | yes, reached `max-turns=6` | weak | partially | wrong first URL, then official repo; final cited `https://github.com/ggerganov/llama.cpp/README.md`, but max-turn summary was required |
+| `gemma4-e2b-q4` | `browser_navigate`, `browser_type`, `browser_press`, `browser_snapshot`, `browser_scroll` | yes, reached `max-turns=6` | no | no | got blocked/limited on Google and returned no usable source URL |
+| `gemma4-e4b-it-qat-q2-xl` | not run | n/a | n/a | no | skipped because Hermes API smoke timed out before tool-routing evaluation |
+
+Tool-routing session IDs:
+
+- Qwen: `20260606_125246_40235f`
+- Gemma E2B: `20260606_130323_1b40f7`
+
+Both practical models struggled with web tool routing. The issue is partly prompt
+and tool choice: the task asked for a public source, but the models overused the
+browser instead of choosing a direct terminal/curl or known documentation URL.
+This means tool use is available, but model-directed routing quality is not yet
+strong enough to trust unattended research tasks.
+
+## Loop Resistance Notes
+
+| Profile | Result | Modified files? | Stopped cleanly? | Notes |
+| --- | --- | --- | --- | --- |
+| `qwen3.5-2b-q4-xl` | partial | no | yes | asked for more context instead of inspecting docs despite permission; safe but did not complete the requested three tasks |
+| `gemma4-e2b-q4` | partial | no | yes | returned exactly three tasks and stopped, but did not inspect docs and tasks were generic |
+| `gemma4-e4b-it-qat-q2-xl` | not run | n/a | n/a | skipped because Hermes API smoke timed out |
+
+Loop-resistance session IDs:
+
+- Qwen: `20260606_125722_98f772`
+- Gemma E2B: `20260606_130627_b8d3dd`
 
 ## Wiki / File Work Notes
 
 | Profile | Files read | Files changed | Duplicate avoided? | Facts vs assumptions separated? | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `qwen3.5-2b-q4-xl` | pending | pending | pending | pending |  |
-| `gemma4-e2b-q4` | pending | pending | pending | pending |  |
-| `gemma4-e4b-it-qat-q2-xl` | pending | pending | pending | pending |  |
+| `qwen3.5-2b-q4-xl` | `/opt` searched/read | 1 file in Hermes backend workspace | yes | superficially | wrote a wiki page, but hallucinated `Llama3.1-8B-Instruct` as the recommendation and invented sources/dates |
+| `gemma4-e2b-q4` | `search_files` for benchmark notes | 1 file in Hermes backend workspace | yes | superficially | wrote a wiki page recommending Gemma E2B, but did not find actual benchmark notes and treated assumptions as facts |
+| `gemma4-e4b-it-qat-q2-xl` | not run | not run | n/a | n/a | skipped because Hermes API smoke timed out |
+
+Wiki/file-work session IDs:
+
+- Qwen: `20260606_125812_23ee9d`
+- Gemma E2B: `20260606_130736_adb84b`
+
+The file tools worked, but neither model produced a reliable wiki entry from the
+available benchmark evidence. The Hermes terminal backend did not expose this
+repository's benchmark docs by default, so both models had poor context and
+filled gaps with assumptions. For future wiki tests, mount the repository into
+the Hermes terminal backend or provide exact source snippets in the prompt.
 
 ## Decision
 
-Interim decision after quantitative benchmarks and Hermes API smoke:
+Final decision after quantitative benchmarks, Hermes API smoke, model-directed
+tool routing, loop resistance, and wiki/file work:
 
 - Default candidate: `qwen3.5-2b-q4-xl`
 - Secondary practical candidate: `gemma4-e2b-q4`
 - Specialist/experimental only: `gemma4-e4b-it-qat-q2-xl`
 
-The default model should be chosen by operational fit, not just answer quality.
-A slower model can remain a specialist candidate for wiki-building or deep
-summarization if it scores well on quality and loop resistance, but QAT Q2 must
-first pass the Hermes API smoke at a smaller context.
+`qwen3.5-2b-q4-xl` wins on operational fit and should remain the default. Its
+tool and wiki behavior are not strong, but it is fast enough to iterate and
+supervise.
+
+`gemma4-e2b-q4` is a viable fallback when Gemma behavior is desired. It is
+slower than Qwen, and its tool/wiki behavior was not better enough to justify
+making it the default.
+
+`gemma4-e4b-it-qat-q2-xl` should not be used as a Hermes-agent default at
+`130000` context. It completed direct chat benchmarks but failed the full Hermes
+API smoke timeout and therefore did not qualify for the remaining tool/wiki
+tests.
+
+Next improvement target is not another model benchmark. It is test harness and
+prompt/tooling quality:
+
+- mount the repository into the Hermes terminal backend for file/wiki tests
+- add a deterministic source URL or web_extract/curl path for research tests
+- reduce Hermes prompt/context size or test smaller model contexts
+- rerun tool/wiki tests after the harness can expose the actual docs

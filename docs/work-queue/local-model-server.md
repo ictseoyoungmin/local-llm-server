@@ -59,6 +59,12 @@
 - [ ] Recheck Qwen3.6 2B availability later. On 2026-06-06, no native
   Qwen3.6 2B Q4 GGUF was found; Unsloth had 27B/35B GGUFs, and the only 2B-class
   related candidate was a Qwen3.5 2B distilled repo with f16/q8 files only.
+- [ ] Improve the Hermes agent-capability test harness before rerunning
+  tool/wiki benchmarks. The 2026-06-06 run showed browser/tool execution works,
+  but model-directed web research looped, and the Hermes terminal backend did
+  not expose this repository's benchmark docs to the file/wiki task.
+- [ ] Mount this repository into the Hermes terminal backend, or provide exact
+  benchmark snippets in the prompt, before scoring wiki/memory quality again.
 
 ## Later
 
