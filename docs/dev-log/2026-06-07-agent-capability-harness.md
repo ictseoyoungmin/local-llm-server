@@ -18,6 +18,10 @@ repository because the Hermes terminal backend did not mount the checkout.
   non-secret mount defaults to an existing `.env.hermes-local-llm-hostuid`.
 - Added `scripts/run_agent_capability_eval.sh` for repeated Hermes
   agent-capability runs.
+- Extended the harness to run `benchmark_chat.py` speed smoke, Hermes routing,
+  and local-agent multiturn before the Hermes tool/file checks.
+- Added a wiki artifact existence check for the file produced by the
+  wiki/file-work task.
 
 ## Harness Behavior
 
@@ -28,8 +32,11 @@ For each selected profile, the harness:
 3. verifies `agent-capability-protocol.md` is readable inside the Hermes
    container,
 4. runs the hostuid API smoke check,
-5. runs bounded Hermes one-shot tasks for tool routing, loop resistance, and
-   wiki/file work.
+5. runs `benchmark_chat.py` short-ready cold/warm, Hermes routing, and
+   local-agent multiturn,
+6. runs bounded Hermes one-shot tasks for tool routing, loop resistance, and
+   wiki/file work,
+7. verifies the expected wiki artifact exists under `/opt/data/workspace`.
 
 Raw JSONL rows are written to
 `docs/verification/benchmarks/results/agent-capability-runs.jsonl`. Per-test

@@ -72,6 +72,9 @@
 - [ ] Rerun the three-model agent capability benchmark with
   `scripts/run_agent_capability_eval.sh` and summarize the JSONL records into
   the dated benchmark report.
+- [x] Add `benchmark_chat.py` speed/routing/multiturn runs to
+  `scripts/run_agent_capability_eval.sh` so protocol items 1, 2, and 3 are
+  executed with the Hermes tool/file checks.
 
 ## Later
 

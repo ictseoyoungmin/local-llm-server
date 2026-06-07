@@ -52,11 +52,26 @@ AGENTCAP_DRY_RUN=1 ./scripts/run_agent_capability_eval.sh
 
 The harness starts each model profile, starts the hostuid Hermes runtime,
 verifies the repository is mounted inside the Hermes container, runs the
-hostuid smoke check, and then runs bounded one-shot tests for tool routing,
-loop resistance, and wiki/file work. Raw JSONL records are appended to:
+hostuid smoke check, then runs:
+
+- `benchmark_chat.py` speed smoke cold/warm
+- `benchmark_chat.py` Hermes routing
+- `benchmark_chat.py` local-agent multiturn
+- bounded Hermes one-shot tool routing
+- bounded Hermes loop resistance
+- bounded Hermes wiki/file work
+- wiki artifact existence check
+
+Harness status records are appended to:
 
 ```text
 docs/verification/benchmarks/results/agent-capability-runs.jsonl
+```
+
+The underlying `benchmark_chat.py` quantitative records are appended to:
+
+```text
+docs/verification/benchmarks/results/chat-benchmarks.jsonl
 ```
 
 The hostuid Hermes container should see this repository at:
