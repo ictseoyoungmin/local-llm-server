@@ -114,6 +114,20 @@ env_value() {
   printf '%s\n' "${default}"
 }
 
+ensure_env_default() {
+  local env_file="$1"
+  local key="$2"
+  local value="$3"
+
+  if [[ ! -f "${env_file}" ]]; then
+    return
+  fi
+  if ! grep -q "^${key}=" "${env_file}"; then
+    printf '%s=%s\n' "${key}" "${value}" >> "${env_file}"
+    echo "Added ${key} to ${env_file}"
+  fi
+}
+
 port_is_listening() {
   local port="$1"
   if command -v ss >/dev/null 2>&1; then
@@ -207,6 +221,9 @@ init_hostuid_runtime() {
   else
     echo "Keeping existing ${HOSTUID_ENV_FILE}"
   fi
+
+  ensure_env_default "${HOSTUID_ENV_FILE}" HERMES_REPO_DIR "."
+  ensure_env_default "${HOSTUID_ENV_FILE}" HERMES_REPO_MOUNT "/workspace/local-llm-server"
 
   local home_dir tui_dist_dir
   home_dir="$(env_value HERMES_HOME_DIR "./.hermes-local-llm-hostuid" "${HOSTUID_ENV_FILE}")"

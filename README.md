@@ -275,6 +275,31 @@ so this `PATH` is preserved. If browser tools report that Chrome cannot be
 launched from `""`, check that `AGENT_BROWSER_EXECUTABLE_PATH` is not blank and
 then run `./scripts/smoke_hermes_browser_tool.sh`.
 
+The hostuid runtime also mounts this repository read-only into the Hermes
+container so terminal/file tasks can read benchmark docs:
+
+```env
+HERMES_REPO_DIR=.
+HERMES_REPO_MOUNT=/workspace/local-llm-server
+```
+
+Use an absolute `HERMES_REPO_DIR` when the checkout is moved, for example to a
+USB-backed path. The mount is read-only by default; Hermes-generated drafts
+should go under `/opt/data/workspace` unless you intentionally change the
+compose file.
+
+To repeat the Hermes agent-capability harness across local model profiles:
+
+```bash
+AGENTCAP_DRY_RUN=1 ./scripts/run_agent_capability_eval.sh
+./scripts/run_agent_capability_eval.sh qwen3.5-2b-q4-xl
+```
+
+The harness records raw JSONL rows under
+`docs/verification/benchmarks/results/` and leaves per-test text outputs under
+the ignored `results/agentcap/` directory. Promote only summarized benchmark
+findings into dated markdown reports.
+
 Record environment results in
 [docs/verification/hermes-storage-compatibility.md](docs/verification/hermes-storage-compatibility.md).
 

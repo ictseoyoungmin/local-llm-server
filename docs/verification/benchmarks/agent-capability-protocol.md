@@ -36,6 +36,38 @@ Record these for every model:
 - peak VRAM/RAM during benchmark if observable
 - benchmark start/end timestamps
 
+## Automation Harness
+
+Use the maintained harness when repeating the Hermes-agent tool/file tests:
+
+```bash
+./scripts/run_agent_capability_eval.sh qwen3.5-2b-q4-xl
+```
+
+To preview commands without starting containers:
+
+```bash
+AGENTCAP_DRY_RUN=1 ./scripts/run_agent_capability_eval.sh
+```
+
+The harness starts each model profile, starts the hostuid Hermes runtime,
+verifies the repository is mounted inside the Hermes container, runs the
+hostuid smoke check, and then runs bounded one-shot tests for tool routing,
+loop resistance, and wiki/file work. Raw JSONL records are appended to:
+
+```text
+docs/verification/benchmarks/results/agent-capability-runs.jsonl
+```
+
+The hostuid Hermes container should see this repository at:
+
+```text
+/workspace/local-llm-server
+```
+
+Override the mount path with `HERMES_REPO_DIR` and `HERMES_REPO_MOUNT` in
+`.env.hermes-local-llm-hostuid` when testing a moved or USB-hosted checkout.
+
 ## Test Set
 
 ### 1. Speed Smoke

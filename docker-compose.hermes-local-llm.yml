@@ -11,6 +11,7 @@ services:
       - ${HERMES_HOME_DIR:-./.hermes}:/opt/data
       - ${HERMES_SEED_DIR:-./.hermes-runtime-example}:/opt/local-llm-hermes-runtime:ro
       - ${HERMES_TUI_DIST_DIR:-./.hermes-local-llm-hostuid-ui-tui-dist}:/opt/hermes/ui-tui/dist
+      - ${HERMES_REPO_DIR:-.}:${HERMES_REPO_MOUNT:-/workspace/local-llm-server}:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker:ro
 
@@ -41,6 +42,7 @@ services:
       HERMES_DASHBOARD_PORT: "9119"
       HERMES_DASHBOARD_TUI: "1"
       HERMES_OVERWRITE_CONFIG: "${HERMES_OVERWRITE_CONFIG:-0}"
+      HERMES_REPO_MOUNT: "${HERMES_REPO_MOUNT:-/workspace/local-llm-server}"
 
     group_add:
       - "${DOCKER_GID:-1001}"

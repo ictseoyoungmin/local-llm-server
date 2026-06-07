@@ -8,6 +8,7 @@ data/
 models/
 logs/
 docs/verification/benchmarks/results/*.jsonl
+docs/verification/benchmarks/results/agentcap/
 hermes-agent-smoke/*
 !hermes-agent-smoke/config.yaml
 .env.hermes-runtime
