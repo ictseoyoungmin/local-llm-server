@@ -20,10 +20,13 @@ agent:
 
 terminal:
   backend: docker
-  cwd: .
+  cwd: /workspace/local-llm-server
   timeout: 180
   docker_image: nikolaik/python-nodejs:python3.11-nodejs20
-  docker_mount_cwd_to_workspace: false
+  docker_mount_cwd_to_workspace: true
+  docker_volumes:
+    # init-hostuid replaces these placeholders with the current checkout path.
+    - __HOST_REPO_DIR__:__HERMES_REPO_MOUNT__:ro
   container_cpu: 1.0
   container_memory: 5120
   container_disk: 51200

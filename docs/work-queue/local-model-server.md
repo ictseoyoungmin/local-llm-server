@@ -76,15 +76,20 @@
 - [x] Add `benchmark_chat.py` speed/routing/multiturn runs to
   `scripts/run_agent_capability_eval.sh` so protocol items 1, 2, and 3 are
   executed with the Hermes tool/file checks.
-- [ ] Fix Hermes terminal/file tool workspace visibility. The top-level
+- [x] Fix Hermes terminal/file tool workspace visibility. The top-level
   container can read `/workspace/local-llm-server`, but model-invoked Hermes
-  tools reported the benchmark docs path as missing.
-- [ ] Add health retry/backoff before `smoke-hostuid`; every profile switch in
+  tools reported the benchmark docs path as missing. Resolution: configure
+  `terminal.docker_volumes` with the absolute host repo path so nested Hermes
+  tool containers receive the repo bind mount.
+- [x] Add health retry/backoff before `smoke-hostuid`; every profile switch in
   the 2026-06-07 rerun hit one startup-time
   `curl: (56) Recv failure: Connection reset by peer`.
-- [ ] Replace the current tool-routing URL with a known existing source or a
+- [x] Replace the current tool-routing URL with a known existing source or a
   deterministic local fixture. The 2026-06-07 URL returned 404 and polluted
-  tool quality scoring.
+  tool quality scoring. Resolution:
+  `docs/verification/benchmarks/fixtures/llama-server-openai-api.md`.
+- [ ] Rerun Qwen/Gemma E2B tool/wiki harness after the workspace and fixture
+  fixes, then update the dated benchmark report.
 
 ## Later
 

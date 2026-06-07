@@ -85,3 +85,23 @@ Important follow-ups from the rerun:
   health/benchmark calls succeeded.
 - `gemma4-e4b-it-qat-q2-xl` loaded at 130k context but was too slow for routine
   Hermes-agent use and timed out on loop/wiki tasks.
+
+## Post-Rerun Fixes
+
+- Restored the default local model to `qwen3.5-2b-q4-xl`.
+- Added retry/backoff to `scripts/smoke_hermes_runtime.sh` before checking the
+  local LLM gateway.
+- Set hostuid Hermes terminal config to use `/workspace/local-llm-server` and
+  nested `docker_volumes` so Hermes tool containers can read the repository.
+- Added a deterministic local tool-routing fixture at
+  `docs/verification/benchmarks/fixtures/llama-server-openai-api.md`.
+
+Verification:
+
+- `./scripts/run_model_profile.sh qwen3.5-2b-q4-xl 130000` restored the gateway
+  health to `qwen3.5-2b-ud-q4-k-xl`.
+- `./scripts/run_hermes_runtime_example.sh smoke-hostuid` reached the Hermes
+  API and returned a local-model response.
+- A Qwen terminal-tool smoke returned `WORKSPACE_OK`; logs showed nested Docker
+  volume
+  `/mnt/f/NowWorking/Local-LLM-Server:/workspace/local-llm-server:ro`.

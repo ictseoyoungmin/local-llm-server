@@ -7,6 +7,27 @@ PROMPT="${HERMES_AGENT_PROMPT:-Reply exactly: hermes gateway local llm ready}"
 LOCAL_GATEWAY_BASE_URL="${LOCAL_LLM_GATEWAY_BASE_URL:-http://127.0.0.1:18080/v1}"
 HERMES_API_READY_TIMEOUT_SECONDS="${HERMES_API_READY_TIMEOUT_SECONDS:-600}"
 HERMES_API_READY_INTERVAL_SECONDS="${HERMES_API_READY_INTERVAL_SECONDS:-5}"
+LOCAL_LLM_READY_TIMEOUT_SECONDS="${LOCAL_LLM_READY_TIMEOUT_SECONDS:-180}"
+LOCAL_LLM_READY_INTERVAL_SECONDS="${LOCAL_LLM_READY_INTERVAL_SECONDS:-3}"
+
+wait_for_local_gateway() {
+  local deadline now
+  deadline=$((SECONDS + LOCAL_LLM_READY_TIMEOUT_SECONDS))
+
+  while true; do
+    if curl -fsS --max-time 10 "${LOCAL_GATEWAY_BASE_URL}/health" >/dev/null; then
+      return 0
+    fi
+
+    now="${SECONDS}"
+    if (( now >= deadline )); then
+      echo "Local LLM gateway did not become ready within ${LOCAL_LLM_READY_TIMEOUT_SECONDS}s: ${LOCAL_GATEWAY_BASE_URL}/health" >&2
+      return 10
+    fi
+
+    sleep "${LOCAL_LLM_READY_INTERVAL_SECONDS}"
+  done
+}
 
 wait_for_hermes_api() {
   local deadline now
@@ -36,7 +57,7 @@ PY
 }
 
 echo "Checking Local LLM gateway: ${LOCAL_GATEWAY_BASE_URL}/health"
-curl -fsS --max-time 10 "${LOCAL_GATEWAY_BASE_URL}/health" >/dev/null
+wait_for_local_gateway
 
 echo "Checking Hermes container: ${HERMES_CONTAINER}"
 docker exec "${HERMES_CONTAINER}" /opt/hermes/.venv/bin/hermes status >/dev/null

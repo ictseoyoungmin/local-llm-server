@@ -279,14 +279,15 @@ The hostuid runtime also mounts this repository read-only into the Hermes
 container so terminal/file tasks can read benchmark docs:
 
 ```env
-HERMES_REPO_DIR=.
+HERMES_REPO_DIR=/absolute/path/to/Local-LLM-Server
 HERMES_REPO_MOUNT=/workspace/local-llm-server
 ```
 
-Use an absolute `HERMES_REPO_DIR` when the checkout is moved, for example to a
-USB-backed path. The mount is read-only by default; Hermes-generated drafts
-should go under `/opt/data/workspace` unless you intentionally change the
-compose file.
+`init-hostuid` fills `HERMES_REPO_DIR` with the current checkout path when it
+creates the env file. Use an absolute path when editing it by hand, for example
+after moving the checkout to a USB-backed path. The mount is read-only by
+default; Hermes-generated drafts should go under `/opt/data/workspace` unless
+you intentionally change the compose file.
 
 To repeat the Hermes agent-capability harness across local model profiles:
 

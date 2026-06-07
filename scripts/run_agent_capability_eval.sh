@@ -248,7 +248,7 @@ verify_wiki_artifact() {
 
   started="$(date +%s)"
   set +e
-  docker exec "${HERMES_CONTAINER}" test -s "${artifact}"
+  timeout 30 docker exec "${HERMES_CONTAINER}" test -s "${artifact}"
   exit_code="$?"
   set -e
   ended="$(date +%s)"
@@ -306,7 +306,7 @@ run_profile() {
   run_chat_benchmark "${profile}" "${model}" "local-agent-multiturn" "${profile}-agentcap-local-agent-multiturn" "${CHAT_BENCH_TIMEOUT}" || true
 
   local tool_prompt loop_prompt wiki_prompt
-  tool_prompt="Use one public source to answer. Prefer terminal curl over browser. Fetch https://raw.githubusercontent.com/ggml-org/llama.cpp/master/examples/server/README.md if network works, then summarize one relevant fact in Korean about llama.cpp server OpenAI-compatible API, cite the URL, and stop after one concise answer."
+  tool_prompt="Use terminal only. Read ${HERMES_REPO_MOUNT}/docs/verification/benchmarks/fixtures/llama-server-openai-api.md, summarize one relevant fact in Korean about llama.cpp server OpenAI-compatible API, cite the local source path, and stop after one concise answer."
   loop_prompt="Inspect ${HERMES_REPO_MOUNT}/docs/verification/benchmarks if needed. Do not modify files. Return at most three concrete next tasks for improving this local LLM project and stop."
   wiki_prompt="Read ${HERMES_REPO_MOUNT}/docs/verification/benchmarks/2026-06-06-agent-capability-3-models.md and ${HERMES_REPO_MOUNT}/docs/verification/benchmarks/agent-capability-protocol.md. Then write /opt/data/workspace/agentcap/local-models/${profile}-hermes-model-selection.md explaining which local model should be used for Hermes-agent today. Separate verified facts from assumptions, include dates, and stop after writing the file and summarizing the path."
 

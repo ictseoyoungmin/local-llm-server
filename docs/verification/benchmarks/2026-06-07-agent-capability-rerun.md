@@ -114,10 +114,12 @@ too slow for everyday Hermes-agent use on this 6GB VRAM machine.
 
 ## Follow-up
 
-- Fix Hermes terminal/file tool workspace visibility for the repo mount.
-- Replace the tool-routing URL with a known existing source or serve a local
-  deterministic source file through the harness.
-- Add a startup wait/retry before Hermes smoke to avoid the repeated gateway
-  `connection reset by peer` race.
+- Fixed after this rerun: Hermes terminal/file tool workspace visibility for
+  the repo mount by configuring nested `terminal.docker_volumes`.
+- Fixed after this rerun: replaced the drifting tool-routing URL with the local
+  deterministic fixture
+  `docs/verification/benchmarks/fixtures/llama-server-openai-api.md`.
+- Fixed after this rerun: added startup wait/retry before Hermes smoke to avoid
+  the repeated gateway `connection reset by peer` race.
 - Keep QAT Q2 tests for isolated/idle runs or smaller contexts such as `32768`
   and `65536`.

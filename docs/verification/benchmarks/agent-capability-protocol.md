@@ -166,9 +166,10 @@ Goal: test whether Hermes-agent can use tools without wasteful loops.
 Task prompt:
 
 ```text
-Find one public source about the current local LLM benchmark target, summarize
-the relevant fact in Korean, and cite the source URL. Use browser/search only
-if needed. Stop after one concise answer.
+Use terminal only. Read
+/workspace/local-llm-server/docs/verification/benchmarks/fixtures/llama-server-openai-api.md,
+summarize one relevant fact in Korean about llama.cpp server OpenAI-compatible
+API, cite the local source path, and stop after one concise answer.
 ```
 
 Record:

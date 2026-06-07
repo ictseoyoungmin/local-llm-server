@@ -128,6 +128,64 @@ ensure_env_default() {
   fi
 }
 
+set_env_value() {
+  local env_file="$1"
+  local key="$2"
+  local value="$3"
+  local tmp_file
+
+  if [[ ! -f "${env_file}" ]]; then
+    return
+  fi
+
+  tmp_file="$(mktemp)"
+  awk -F= -v key="${key}" -v value="${value}" '
+    $1 == key {
+      print key "=" value
+      found = 1
+      next
+    }
+    { print }
+    END {
+      if (!found) {
+        print key "=" value
+      }
+    }
+  ' "${env_file}" > "${tmp_file}"
+  cp "${tmp_file}" "${env_file}"
+  rm -f "${tmp_file}"
+}
+
+escape_sed_replacement() {
+  printf '%s' "$1" | sed -e 's/[&#]/\\&/g'
+}
+
+render_config_placeholders() {
+  local config_file="$1"
+  local repo_dir="$2"
+  local repo_mount="$3"
+  local tmp_file escaped_repo_dir escaped_repo_mount
+
+  if [[ ! -f "${config_file}" ]]; then
+    return
+  fi
+
+  if ! grep -q "__HOST_REPO_DIR__\\|__HERMES_REPO_MOUNT__" "${config_file}"; then
+    return
+  fi
+
+  escaped_repo_dir="$(escape_sed_replacement "${repo_dir}")"
+  escaped_repo_mount="$(escape_sed_replacement "${repo_mount}")"
+  tmp_file="$(mktemp)"
+  sed \
+    -e "s#__HOST_REPO_DIR__#${escaped_repo_dir}#g" \
+    -e "s#__HERMES_REPO_MOUNT__#${escaped_repo_mount}#g" \
+    "${config_file}" > "${tmp_file}"
+  cp "${tmp_file}" "${config_file}"
+  rm -f "${tmp_file}"
+  echo "Rendered repo mount placeholders in ${config_file}"
+}
+
 port_is_listening() {
   local port="$1"
   if command -v ss >/dev/null 2>&1; then
@@ -222,8 +280,16 @@ init_hostuid_runtime() {
     echo "Keeping existing ${HOSTUID_ENV_FILE}"
   fi
 
-  ensure_env_default "${HOSTUID_ENV_FILE}" HERMES_REPO_DIR "."
+  ensure_env_default "${HOSTUID_ENV_FILE}" HERMES_REPO_DIR "$(pwd -P)"
   ensure_env_default "${HOSTUID_ENV_FILE}" HERMES_REPO_MOUNT "/workspace/local-llm-server"
+  if [[ "$(env_value HERMES_REPO_DIR "." "${HOSTUID_ENV_FILE}")" == "." || "$(env_value HERMES_REPO_DIR "." "${HOSTUID_ENV_FILE}")" == "/absolute/path/to/Local-LLM-Server" ]]; then
+    set_env_value "${HOSTUID_ENV_FILE}" HERMES_REPO_DIR "$(pwd -P)"
+    echo "Updated HERMES_REPO_DIR in ${HOSTUID_ENV_FILE} to $(pwd -P)"
+  fi
+  render_config_placeholders \
+    "${SEED_DIR}/config.yaml" \
+    "$(env_value HERMES_REPO_DIR "$(pwd -P)" "${HOSTUID_ENV_FILE}")" \
+    "$(env_value HERMES_REPO_MOUNT "/workspace/local-llm-server" "${HOSTUID_ENV_FILE}")"
 
   local home_dir tui_dist_dir
   home_dir="$(env_value HERMES_HOME_DIR "./.hermes-local-llm-hostuid" "${HOSTUID_ENV_FILE}")"
