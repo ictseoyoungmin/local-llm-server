@@ -38,7 +38,7 @@
   explicitly with `scripts/export_model_profile_env.sh`.
 - [x] Add Qwen Q8 profile if Q4 XL quality is insufficient. Profile added as a
   quality fallback; default remains non-MTP Q4 XL based on current benchmarks.
-- [ ] Run an end-to-end Hermes tool workflow and record whether llama.cpp
+- [x] Run an end-to-end Hermes tool workflow and record whether llama.cpp
   honors tool schemas for the selected profile/runtime.
 - [ ] Add a combined Hermes tool smoke that exercises browser navigation,
   terminal execution, and one local LLM follow-up in the same chat session.
@@ -69,12 +69,22 @@
   benchmark snippets in the prompt, before scoring wiki/memory quality again.
   Resolution: hostuid compose mounts `${HERMES_REPO_DIR:-.}` read-only at
   `${HERMES_REPO_MOUNT:-/workspace/local-llm-server}`.
-- [ ] Rerun the three-model agent capability benchmark with
+- [x] Rerun the three-model agent capability benchmark with
   `scripts/run_agent_capability_eval.sh` and summarize the JSONL records into
-  the dated benchmark report.
+  the dated benchmark report. Result:
+  `docs/verification/benchmarks/2026-06-07-agent-capability-rerun.md`.
 - [x] Add `benchmark_chat.py` speed/routing/multiturn runs to
   `scripts/run_agent_capability_eval.sh` so protocol items 1, 2, and 3 are
   executed with the Hermes tool/file checks.
+- [ ] Fix Hermes terminal/file tool workspace visibility. The top-level
+  container can read `/workspace/local-llm-server`, but model-invoked Hermes
+  tools reported the benchmark docs path as missing.
+- [ ] Add health retry/backoff before `smoke-hostuid`; every profile switch in
+  the 2026-06-07 rerun hit one startup-time
+  `curl: (56) Recv failure: Connection reset by peer`.
+- [ ] Replace the current tool-routing URL with a known existing source or a
+  deterministic local fixture. The 2026-06-07 URL returned 404 and polluted
+  tool quality scoring.
 
 ## Later
 

@@ -86,7 +86,7 @@ append_json_record() {
   local elapsed_seconds="$6"
   local session_id="$7"
   local output_file="$8"
-  local details_json="${9:-{}}"
+  local details_json="${9:-"{}"}"
 
   if is_truthy "${DRY_RUN}"; then
     return 0

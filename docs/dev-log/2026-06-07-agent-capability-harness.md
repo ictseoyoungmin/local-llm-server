@@ -70,3 +70,18 @@ Results:
 
 Full three-model rerun is left as the next benchmark slice because it can take
 longer and may disturb the desktop when 4B-class profiles are active.
+
+## Rerun Result
+
+The three-model rerun completed on 2026-06-07 and is summarized in
+`docs/verification/benchmarks/2026-06-07-agent-capability-rerun.md`.
+
+Important follow-ups from the rerun:
+
+- The top-level Hermes container can read the repo mount, but Hermes
+  model-invoked terminal/file tools still reported the benchmark docs path as
+  missing.
+- Each profile switch hit one startup-time gateway health reset before later
+  health/benchmark calls succeeded.
+- `gemma4-e4b-it-qat-q2-xl` loaded at 130k context but was too slow for routine
+  Hermes-agent use and timed out on loop/wiki tasks.
