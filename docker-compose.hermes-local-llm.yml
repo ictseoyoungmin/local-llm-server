@@ -42,9 +42,10 @@ services:
       HERMES_DASHBOARD_PORT: "9119"
       HERMES_DASHBOARD_TUI: "1"
       HERMES_OVERWRITE_CONFIG: "${HERMES_OVERWRITE_CONFIG:-0}"
+      HERMES_HOME_DIR: "${HERMES_HOME_DIR:-./.hermes}"
       HERMES_REPO_DIR: "${HERMES_REPO_DIR:-.}"
       HERMES_REPO_MOUNT: "${HERMES_REPO_MOUNT:-/workspace/local-llm-server}"
-      TERMINAL_DOCKER_VOLUMES: '["${HERMES_REPO_DIR:-.}:${HERMES_REPO_MOUNT:-/workspace/local-llm-server}:ro"]'
+      TERMINAL_DOCKER_VOLUMES: '["${HERMES_REPO_DIR:-.}:${HERMES_REPO_MOUNT:-/workspace/local-llm-server}:ro","${HERMES_HOME_DIR:-./.hermes}:/opt/data"]'
 
     group_add:
       - "${DOCKER_GID:-1001}"

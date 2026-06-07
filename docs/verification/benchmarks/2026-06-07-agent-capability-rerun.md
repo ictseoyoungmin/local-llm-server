@@ -116,6 +116,10 @@ too slow for everyday Hermes-agent use on this 6GB VRAM machine.
 
 - Fixed after this rerun: Hermes terminal/file tool workspace visibility for
   the repo mount by configuring nested `terminal.docker_volumes`.
+- Fixed after this rerun: Hermes wiki artifacts created by nested tool
+  containers were not visible to the top-level Hermes `/opt/data`. The hostuid
+  config now also mounts the host Hermes data directory into nested tool
+  containers at `/opt/data`.
 - Fixed after this rerun: replaced the drifting tool-routing URL with the local
   deterministic fixture
   `docs/verification/benchmarks/fixtures/llama-server-openai-api.md`.
@@ -123,3 +127,77 @@ too slow for everyday Hermes-agent use on this 6GB VRAM machine.
   the repeated gateway `connection reset by peer` race.
 - Keep QAT Q2 tests for isolated/idle runs or smaller contexts such as `32768`
   and `65536`.
+
+## Post-Fix Two-Model Rerun
+
+Command:
+
+```bash
+./scripts/run_agent_capability_eval.sh qwen3.5-2b-q4-xl gemma4-e2b-q4
+```
+
+Runtime:
+
+- Date: 2026-06-07 18:23-18:37 KST.
+- Context: `130000` requested, llama.cpp health reported `130048`.
+- llama.cpp image digest:
+  `sha256:bdc62a30471f456cbeee251c565f555d486d0ef4451f27f92ec9b4a9ed966eab`.
+- llama.cpp version: `9501 (65ef50a0a)`.
+- Hermes hostuid nested mounts:
+  `/workspace/local-llm-server` read-only for repo data and `/opt/data`
+  writable for agent workspace artifacts.
+
+Quantitative results:
+
+| Profile | Test | Status | Harness elapsed | Prompt tok/s | Generation tok/s | Notes |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| `qwen3.5-2b-q4-xl` | short-ready cold label | success | `8s` | `120.514` | `117.117` | run occurred after Hermes smoke warmup, so not a true full cold prefill |
+| `qwen3.5-2b-q4-xl` | short-ready warm | success | `2s` | `95.444` | `121.014` | stable warm smoke |
+| `qwen3.5-2b-q4-xl` | Hermes routing | success | `3s` | `293.624` | `55.115` | fastest routing |
+| `qwen3.5-2b-q4-xl` | multiturn | success | `9s` | `451.596` | `59.476` | fastest multiturn |
+| `gemma4-e2b-q4` | short-ready cold label | success | `12s` | `29.425` | `90.298` | run occurred after Hermes smoke warmup |
+| `gemma4-e2b-q4` | short-ready warm | success | `9s` | `39.740` | `91.617` | slower prompt path in this run |
+| `gemma4-e2b-q4` | Hermes routing | success | `10s` | `23.014` | `21.740` | slower than prior Gemma run |
+| `gemma4-e2b-q4` | multiturn | success | `13s` | `114.789` | `37.871` | practical but below Qwen |
+
+Hermes tool/file results after fixes:
+
+| Profile | Tool routing | Loop resistance | Wiki/file work | Artifact check | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `qwen3.5-2b-q4-xl` | success, `51s` | success, `49s` | success, `90s` | success | cited local fixture; loop task stopped but claimed benchmark docs were empty, so quality remains limited |
+| `gemma4-e2b-q4` | success, `90s` | success, `41s` | success, `109s` | success | cited local fixture; loop task also misread the benchmark directory as missing or empty |
+
+Session IDs:
+
+- Qwen tool: `20260607_092409_7f5b17`
+- Qwen loop: `20260607_092450_20af3a`
+- Qwen wiki: `20260607_092539_f4b5b3`
+- Gemma E2B tool: `20260607_093320_f822d1`
+- Gemma E2B loop: `20260607_093438_ab2e4a`
+- Gemma E2B wiki: `20260607_093521_e79c03`
+
+Post-fix findings:
+
+- The original repo visibility problem is fixed for nested Hermes tool
+  containers.
+- The wiki artifact persistence problem is fixed after adding the writable
+  `/opt/data` nested mount.
+- Tool-routing is now deterministic because it reads the local fixture instead
+  of depending on web access or a drifting URL.
+- Both 2B profiles still show weak directory/file reasoning in loop tasks.
+  They can use tools, but they need tighter prompts or harness-level checks for
+  reliable unattended wiki building.
+
+Updated score adjustment:
+
+| Profile | Speed | Stability | Instruction following | Tool use | Loop resistance | Goal completion | Answer quality | Wiki/memory quality | Operational fit | Weighted result |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `qwen3.5-2b-q4-xl` | `5` | `4` | `3` | `4` | `2` | `4` | `3` | `3` | `5` | `4.0 / 5` |
+| `gemma4-e2b-q4` | `3` | `4` | `3` | `4` | `3` | `4` | `3` | `3` | `4` | `3.7 / 5` |
+
+Post-fix decision:
+
+Default remains `qwen3.5-2b-q4-xl`. It is faster and now completes the
+deterministic tool/wiki artifact checks. `gemma4-e2b-q4` remains the practical
+fallback, but its post-fix routing run was slower and it still misread the
+benchmark directory during loop resistance.

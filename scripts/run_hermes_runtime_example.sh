@@ -51,6 +51,11 @@ init_runtime() {
   else
     echo "Keeping existing ${SEED_DIR}/config.yaml"
   fi
+  render_config_placeholders \
+    "${SEED_DIR}/config.yaml" \
+    "$(env_value HERMES_REPO_DIR "$(pwd -P)" "${ENV_FILE}")" \
+    "$(env_value HERMES_REPO_MOUNT "/workspace/local-llm-server" "${ENV_FILE}")" \
+    "$(env_value HERMES_DATA_VOLUME "local-llm-hermes-data" "${ENV_FILE}")"
 
   if [[ ! -f "${SEED_DIR}/SOUL.md" ]]; then
     printf '%s\n' '# Hermes Local Runtime' '' 'Use the configured local LLM gateway for this runtime.' > "${SEED_DIR}/SOUL.md"
@@ -164,26 +169,56 @@ render_config_placeholders() {
   local config_file="$1"
   local repo_dir="$2"
   local repo_mount="$3"
-  local tmp_file escaped_repo_dir escaped_repo_mount
+  local hermes_home_dir="$4"
+  local tmp_file escaped_repo_dir escaped_repo_mount escaped_hermes_home_dir
 
   if [[ ! -f "${config_file}" ]]; then
     return
   fi
 
-  if ! grep -q "__HOST_REPO_DIR__\\|__HERMES_REPO_MOUNT__" "${config_file}"; then
+  if ! grep -q "__HOST_REPO_DIR__\\|__HERMES_REPO_MOUNT__\\|__HOST_HERMES_HOME_DIR__" "${config_file}"; then
     return
   fi
 
   escaped_repo_dir="$(escape_sed_replacement "${repo_dir}")"
   escaped_repo_mount="$(escape_sed_replacement "${repo_mount}")"
+  escaped_hermes_home_dir="$(escape_sed_replacement "${hermes_home_dir}")"
   tmp_file="$(mktemp)"
   sed \
     -e "s#__HOST_REPO_DIR__#${escaped_repo_dir}#g" \
     -e "s#__HERMES_REPO_MOUNT__#${escaped_repo_mount}#g" \
+    -e "s#__HOST_HERMES_HOME_DIR__#${escaped_hermes_home_dir}#g" \
     "${config_file}" > "${tmp_file}"
   cp "${tmp_file}" "${config_file}"
   rm -f "${tmp_file}"
   echo "Rendered repo mount placeholders in ${config_file}"
+}
+
+host_absolute_path() {
+  local path="$1"
+  if [[ "${path}" == /* ]]; then
+    printf '%s\n' "${path}"
+    return
+  fi
+  printf '%s/%s\n' "$(pwd -P)" "${path#./}"
+}
+
+replace_opt_data_volume_source() {
+  local config_file="$1"
+  local source_path="$2"
+  local escaped_source tmp_file
+
+  if [[ ! -f "${config_file}" ]]; then
+    return
+  fi
+
+  escaped_source="$(escape_sed_replacement "${source_path}")"
+  tmp_file="$(mktemp)"
+  sed -E \
+    "s#^([[:space:]]*-[[:space:]]*)[^[:space:]]+:/opt/data\$#\\1${escaped_source}:/opt/data#" \
+    "${config_file}" > "${tmp_file}"
+  cp "${tmp_file}" "${config_file}"
+  rm -f "${tmp_file}"
 }
 
 port_is_listening() {
@@ -286,15 +321,16 @@ init_hostuid_runtime() {
     set_env_value "${HOSTUID_ENV_FILE}" HERMES_REPO_DIR "$(pwd -P)"
     echo "Updated HERMES_REPO_DIR in ${HOSTUID_ENV_FILE} to $(pwd -P)"
   fi
-  render_config_placeholders \
-    "${SEED_DIR}/config.yaml" \
-    "$(env_value HERMES_REPO_DIR "$(pwd -P)" "${HOSTUID_ENV_FILE}")" \
-    "$(env_value HERMES_REPO_MOUNT "/workspace/local-llm-server" "${HOSTUID_ENV_FILE}")"
-
   local home_dir tui_dist_dir
   home_dir="$(env_value HERMES_HOME_DIR "./.hermes-local-llm-hostuid" "${HOSTUID_ENV_FILE}")"
   tui_dist_dir="$(env_value HERMES_TUI_DIST_DIR "./.hermes-local-llm-hostuid-ui-tui-dist" "${HOSTUID_ENV_FILE}")"
   mkdir -p "${home_dir}" "${tui_dist_dir}"
+  render_config_placeholders \
+    "${SEED_DIR}/config.yaml" \
+    "$(env_value HERMES_REPO_DIR "$(pwd -P)" "${HOSTUID_ENV_FILE}")" \
+    "$(env_value HERMES_REPO_MOUNT "/workspace/local-llm-server" "${HOSTUID_ENV_FILE}")" \
+    "$(host_absolute_path "${home_dir}")"
+  replace_opt_data_volume_source "${SEED_DIR}/config.yaml" "$(host_absolute_path "${home_dir}")"
 }
 
 command="${1:-}"

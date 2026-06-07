@@ -81,6 +81,10 @@
   tools reported the benchmark docs path as missing. Resolution: configure
   `terminal.docker_volumes` with the absolute host repo path so nested Hermes
   tool containers receive the repo bind mount.
+- [x] Fix Hermes wiki artifact persistence. The nested Hermes tool containers
+  could report successful `write_file` calls, but the top-level Hermes
+  `/opt/data/workspace` did not see the file. Resolution: add the hostuid
+  Hermes data directory to nested `terminal.docker_volumes` at `/opt/data`.
 - [x] Add health retry/backoff before `smoke-hostuid`; every profile switch in
   the 2026-06-07 rerun hit one startup-time
   `curl: (56) Recv failure: Connection reset by peer`.
@@ -88,8 +92,12 @@
   deterministic local fixture. The 2026-06-07 URL returned 404 and polluted
   tool quality scoring. Resolution:
   `docs/verification/benchmarks/fixtures/llama-server-openai-api.md`.
-- [ ] Rerun Qwen/Gemma E2B tool/wiki harness after the workspace and fixture
-  fixes, then update the dated benchmark report.
+- [x] Rerun Qwen/Gemma E2B tool/wiki harness after the workspace and fixture
+  fixes, then update the dated benchmark report. Result: both 2B profiles pass
+  deterministic tool-routing and wiki artifact checks; Qwen remains default.
+- [ ] Improve loop-resistance prompt or harness checks. In the post-fix
+  2026-06-07 run, both Qwen and Gemma E2B could read mounted files, but still
+  misreported the benchmark directory as empty or missing in loop tasks.
 
 ## Later
 

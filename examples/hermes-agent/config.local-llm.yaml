@@ -27,6 +27,7 @@ terminal:
   docker_volumes:
     # init-hostuid replaces these placeholders with the current checkout path.
     - __HOST_REPO_DIR__:__HERMES_REPO_MOUNT__:ro
+    - __HOST_HERMES_HOME_DIR__:/opt/data
   container_cpu: 1.0
   container_memory: 5120
   container_disk: 51200
